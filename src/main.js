@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import gsap from "gsap";
 
 const canvas = document.querySelector("#experience-canvas");
 
@@ -15,6 +16,41 @@ const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 const raycasterObject = [];
 let currentIntersects = [];
+
+const model = {
+  work: document.querySelector(".model.work"),
+  about: document.querySelector(".model.about"),
+  contact: document.querySelector(".model.contact"),
+};
+
+document.querySelector("model-exit-button").forEach((button) => {
+  button.addEventListener("click", (event) => {
+    const model = e.target.clossest(".model");
+    hideModel(model);
+  });
+});
+
+const showModel = (model) => {
+  model.style.display = "block";
+
+  gsap.set(model, { opacity: 0 });
+
+  gsap.to(model, {
+    opacity: 1,
+    duration: 0.5,
+  });
+};
+
+const hideModel = (model) => {
+  gsap.to(model, {
+    opacity: 0,
+    duration: 0.5,
+    onComplete: () => {
+      model.style.display = "none";
+    },
+  });
+};
+
 /* ================= SIZES ================= */
 const sizes = {
   width: window.innerWidth,
@@ -23,7 +59,7 @@ const sizes = {
 
 const socialLinks = {
   GitHub: "https://github.com/ThomasShikalepo",
-  LinkedIn: "www.linkedin.com/in/thomas-shikalepo",
+  LinkedIn: "https://www.linkedin.com/in/thomas-shikalepo",
   Instagrem: "https://www.instagram.com/thomas__deon/",
 };
 
@@ -47,6 +83,14 @@ window.addEventListener("click", (click) => {
         newWindow.rel = "noopener noreferrer";
       }
     });
+
+    if (object.name.includes("Work_Button")) {
+      showModel(model.work);
+    } else if (object.name.includes("About_Button")) {
+      showModel(model.about);
+    } else if (object.name.includes("Contact_Button")) {
+      showModel(model.contact);
+    }
   }
 });
 
@@ -55,7 +99,7 @@ const camera = new THREE.PerspectiveCamera(
   45,
   sizes.width / sizes.height,
   0.1,
-  1000
+  1000,
 );
 camera.position.set(-4.877604882995123, -8.271879094271918, 9.847558929262831);
 
@@ -78,7 +122,7 @@ controls.maxDistance = 50;
 controls.target.set(
   -2.1994280240124406,
   -10.324640060721578,
-  6.457151867306472
+  6.457151867306472,
 );
 controls.update();
 
@@ -118,12 +162,8 @@ gltfLoader.load(
   "/model/rom_compressed.glb",
   (glb) => {
     glb.scene.traverse((child) => {
-      if (child.isMesh) {
-        console.log(child.name || "(unnamed mesh)");
-      }
-
       if (child.isMesh && child.name.includes("_Pointer_Hover")) {
-        child.material = child.material.clone();
+        // child.material = child.material.clone();
         raycasterObject.push(child);
       }
 
@@ -168,7 +208,7 @@ gltfLoader.load(
     scene.add(glb.scene);
   },
   undefined,
-  (error) => console.error("Error loading GLB:", error)
+  (error) => console.error("Error loading GLB:", error),
 );
 /* ===============
 == RESIZE ================= */
