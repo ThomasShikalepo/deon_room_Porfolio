@@ -38,7 +38,7 @@ window.addEventListener("click", (click) => {
   if (currentIntersects.length > 0) {
     const object = currentIntersects[0].object;
 
-    Object.entries(socialLinks).forEach(([KeyboardEvent, url]) => {
+    Object.entries(socialLinks).forEach(([key, url]) => {
       if (object.name.includes(key)) {
         const newWindow = window.open();
         newWindow.opener = null;
@@ -115,9 +115,13 @@ const environmentMap = new THREE.CubeTextureLoader()
 
 /* ================= LOAD GLB ================= */
 gltfLoader.load(
-  "/model/new.glb",
+  "/model/rom_compressed.glb",
   (glb) => {
     glb.scene.traverse((child) => {
+      if (child.isMesh) {
+        console.log(child.name || "(unnamed mesh)");
+      }
+
       if (child.isMesh && child.name.includes("_Pointer_Hover")) {
         child.material = child.material.clone();
         raycasterObject.push(child);
@@ -155,7 +159,7 @@ gltfLoader.load(
         }
       }
     });
-    console.log(raycasterObject);
+
     // Center the whole model
     const box = new THREE.Box3().setFromObject(glb.scene);
     const center = box.getCenter(new THREE.Vector3());
