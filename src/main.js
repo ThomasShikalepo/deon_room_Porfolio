@@ -17,6 +17,8 @@ const pointer = new THREE.Vector2();
 const raycasterObject = [];
 let currentIntersects = [];
 
+let currentHoveredObject = null;
+
 const model = {
   work: document.querySelector(".model.work"),
   about: document.querySelector(".model.about"),
@@ -193,19 +195,26 @@ gltfLoader.load(
   "/model/rom_compressed.glb",
   (glb) => {
     glb.scene.traverse((child) => {
-      if (child.isMesh && child.name.includes("_Pointer_Hover")) {
-        // child.material = child.material.clone();
+      if (!child.isMesh) return;
+
+      if (child.name.includes("Pointer")) {
         raycasterObject.push(child);
       }
 
-      if (child.isMesh && child.name === "computer_Screen") {
-        // Apply the video texture only to the pc_screen mesh
+      if (child.name.includes("Hover")) {
+        child.userData.initialScale = child.scale.clone();
+        child.userData.initialPosition = child.position.clone();
+        child.userData.initialRotation = child.rotation.clone();
+      }
+
+      if (child.name === "computer_Screen") {
         child.material = new THREE.MeshStandardMaterial({
           map: videoTexture,
           roughness: 0.5,
           metalness: 0,
         });
       }
+
       if (child.name.includes("Computer_Glass")) {
         child.material = new THREE.MeshPhysicalMaterial({
           transmission: 1,
@@ -217,8 +226,6 @@ gltfLoader.load(
           specularIntensity: 1,
           specularColor: 0xffffff,
           envMapIntensity: 1,
-          lightIntensity: 1,
-          exposure: 1,
         });
       }
 
@@ -231,7 +238,7 @@ gltfLoader.load(
       }
     });
 
-    // Center the whole model
+    /* ================= CENTER MODEL ================= */
     const box = new THREE.Box3().setFromObject(glb.scene);
     const center = box.getCenter(new THREE.Vector3());
     glb.scene.position.sub(center);
@@ -241,6 +248,7 @@ gltfLoader.load(
   undefined,
   (error) => console.error("Error loading GLB:", error),
 );
+
 /* ===============
 == RESIZE ================= */
 window.addEventListener("resize", () => {
@@ -254,6 +262,41 @@ window.addEventListener("resize", () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
+function playHoverAnimation(object, isHovering) {
+  gsap.killTweensOf(object.scale);
+  gsap.killTweensOf(object.rotation);
+  gsap.killTweensOf(object.position);
+
+  if (isHovering) {
+    gsap.to(object.scale, {
+      x: object.userData.initialScale.x * 1.2,
+      y: object.userData.initialScale.y * 1.2,
+      z: object.userData.initialScale.z * 1.2,
+      duration: 0.5,
+      ease: "bounce.out(1.8)",
+    });
+
+    gsap.to(object.rotation, {
+      y: object.userData.initialRotation.y + Math.PI / 8,
+      duration: 0.5,
+      ease: "bounce.out(1.8)",
+    });
+  } else {
+    gsap.to(object.scale, {
+      x: object.userData.initialScale.x,
+      y: object.userData.initialScale.y,
+      z: object.userData.initialScale.z,
+      duration: 0.3,
+      ease: "bounce.out(1.8)",
+    });
+
+    gsap.to(object.rotation, {
+      y: object.userData.initialRotation.y,
+      duration: 0.3,
+      ease: "bounce.out(1.8)",
+    });
+  }
+}
 /* ================= ANIMATE ================= */
 const render = () => {
   controls.update();
@@ -269,15 +312,30 @@ const render = () => {
   raycaster.setFromCamera(pointer, camera);
   currentIntersects = raycaster.intersectObjects(raycasterObject, true);
 
-  raycasterObject.forEach((obj) => {
-    if (obj.material?.color) {
-      obj.material.color.set(0xffffff);
-    }
-  });
-
   if (currentIntersects.length > 0) {
-    document.body.style.cursor = "pointer";
+    const currentIntersectObject = currentIntersects[0].object;
+
+    if (currentIntersectObject.name.includes("Hover")) {
+      if (currentIntersectObject !== currentHoveredObject) {
+        if (currentHoveredObject) {
+          playHoverAnimation(currentHoveredObject, false);
+        }
+
+        playHoverAnimation(currentIntersectObject, true);
+        currentHoveredObject = currentIntersectObject;
+      }
+    }
+
+    if (currentIntersectObject.name.includes("Pointer")) {
+      document.body.style.cursor = "pointer";
+    } else {
+      document.body.style.cursor = "default";
+    }
   } else {
+    if (currentHoveredObject) {
+      playHoverAnimation(currentHoveredObject, false);
+      currentHoveredObject = null;
+    }
     document.body.style.cursor = "default";
   }
 
