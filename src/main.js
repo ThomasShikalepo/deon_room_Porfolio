@@ -23,11 +23,28 @@ const model = {
   contact: document.querySelector(".model.contact"),
 };
 
-document.querySelector("model-exit-button").forEach((button) => {
-  button.addEventListener("click", (event) => {
-    const model = e.target.clossest(".model");
-    hideModel(model);
-  });
+let touchHappened = false;
+
+document.querySelectorAll(".model-exit-button").forEach((button) => {
+  button.addEventListener(
+    "touchend",
+    (event) => {
+      touchHappened = true;
+      const model = event.target.closest(".model");
+      hideModel(model);
+    },
+    { passive: false },
+  );
+
+  button.addEventListener(
+    "click",
+    (event) => {
+      if (touchHappened) return;
+      const model = event.target.closest(".model");
+      hideModel(model);
+    },
+    { passive: false },
+  );
 });
 
 const showModel = (model) => {
@@ -64,35 +81,49 @@ const socialLinks = {
 };
 
 window.addEventListener("mousemove", (event) => {
-  const rect = canvas.getBoundingClientRect();
-
-  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-  pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  touchHappened = false;
+  pointer.x = (event.clientX / sizes.width) * 2 - 1;
+  pointer.y = -(event.clientY / sizes.height) * 2 + 1;
 });
 
-window.addEventListener("click", (click) => {
+window.addEventListener(
+  "touchstart",
+  (event) => {
+    event.preventDefault();
+    pointer.x = (event.touches[0].clientX / sizes.width) * 2 - 1;
+    pointer.y = -(event.touches[0].clientY / sizes.height) * 2 + 1;
+  },
+  { passive: false },
+);
+
+window.addEventListener(
+  "touchend",
+  (event) => {
+    event.preventDefault();
+    pointer.x = (event.changedTouches[0].clientX / sizes.width) * 2 - 1;
+    pointer.y = -(event.changedTouches[0].clientY / sizes.height) * 2 + 1;
+    handleRaycasterInteractions();
+  },
+  { passive: false },
+);
+
+function handleRaycasterInteractions() {
   if (currentIntersects.length > 0) {
     const object = currentIntersects[0].object;
 
     Object.entries(socialLinks).forEach(([key, url]) => {
       if (object.name.includes(key)) {
-        const newWindow = window.open();
-        newWindow.opener = null;
-        newWindow.location = url;
-        newWindow.target = "_blank";
-        newWindow.rel = "noopener noreferrer";
+        window.open(url, "_blank", "noopener,noreferrer");
       }
     });
 
-    if (object.name.includes("Work_Button")) {
-      showModel(model.work);
-    } else if (object.name.includes("About_Button")) {
-      showModel(model.about);
-    } else if (object.name.includes("Contact_Button")) {
-      showModel(model.contact);
-    }
+    if (object.name.includes("Work_Button")) showModel(model.work);
+    else if (object.name.includes("About_Button")) showModel(model.about);
+    else if (object.name.includes("Contact_Button")) showModel(model.contact);
   }
-});
+}
+
+window.addEventListener("click", handleRaycasterInteractions);
 
 /* ================= CAMERA ================= */
 const camera = new THREE.PerspectiveCamera(
