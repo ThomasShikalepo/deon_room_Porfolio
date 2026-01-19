@@ -249,7 +249,6 @@ gltfLoader.load(
           child.userData.initialScale,
         );
       }
-
       // Buttons
       if (
         child.name.includes("My_Work_Button") ||
@@ -266,7 +265,6 @@ gltfLoader.load(
           child.userData.initialScale,
         );
       }
-
       // Set initial scale for intro animation
       if (child.name.includes("Hanging_Plank_1")) {
         plank1 = child;
@@ -344,12 +342,14 @@ gltfLoader.load(
 function playIntroAnimation() {
   const t1 = gsap.timeline({ duration: 0.8, ease: "back.out(1.8)" });
 
+  t1.timeScale(0.8);
+
   // Animate scales up
   if (plank1) t1.to(plank1.scale, { x: 1, z: 1 });
-  if (plank2) t1.to(plank2.scale, { x: 1, y: 1, z: 1 });
-  if (workBtn) t1.to(workBtn.scale, { x: 1, y: 1, z: 1 });
-  if (aboutBtn) t1.to(aboutBtn.scale, { x: 1, y: 1, z: 1 });
-  if (contactBtn) t1.to(contactBtn.scale, { x: 1, y: 1, z: 1 });
+  if (plank2) t1.to(plank2.scale, { x: 1, y: 1, z: 1 }, "-=0.5");
+  if (workBtn) t1.to(workBtn.scale, { x: 0.5, y: 0.5, z: 0.5 });
+  if (aboutBtn) t1.to(aboutBtn.scale, { x: 0.4, y: 0.4, z: 0.4 });
+  if (contactBtn) t1.to(contactBtn.scale, { x: 0.5, y: 0.5, z: 0.5 });
 
   // Snap back to original scale after animation
   t1.eventCallback("onComplete", () => {
@@ -361,7 +361,6 @@ function playIntroAnimation() {
     });
   });
 }
-
 /* ===============
 == RESIZE ================= */
 window.addEventListener("resize", () => {
