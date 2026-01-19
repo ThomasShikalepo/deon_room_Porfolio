@@ -17,6 +17,16 @@ const pointer = new THREE.Vector2();
 const raycasterObject = [];
 let currentIntersects = [];
 
+let plank1,
+  plank2,
+  workBtn,
+  aboutBtn,
+  contactBtn,
+  boba,
+  github,
+  linkedin,
+  insta;
+
 let currentHoveredObject = null;
 
 const model = {
@@ -227,10 +237,64 @@ gltfLoader.load(
         raycasterObject.push(child);
       }
 
+      // Hover objects
       if (child.name.includes("Hover")) {
         child.userData.initialScale = child.scale.clone();
         child.userData.initialPosition = child.position.clone();
         child.userData.initialRotation = child.rotation.clone();
+        console.log(
+          "👆 Hover object found:",
+          child.name,
+          "initialScale:",
+          child.userData.initialScale,
+        );
+      }
+
+      // Buttons
+      if (
+        child.name.includes("My_Work_Button") ||
+        child.name.includes("About_Button") ||
+        child.name.includes("Contact_Button") ||
+        child.name.includes("Hanging_Plank")
+      ) {
+        child.userData.initialScale =
+          child.userData.initialScale || child.scale.clone(); // ensure initialScale exists
+        console.log(
+          "📌 Button / Plank found:",
+          child.name,
+          "initialScale:",
+          child.userData.initialScale,
+        );
+      }
+
+      // Set initial scale for intro animation
+      if (child.name.includes("Hanging_Plank_1")) {
+        plank1 = child;
+        child.scale.set(0, 0, 1);
+      } else if (child.name.includes("Hanging_Plank_2")) {
+        plank2 = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("My_Work_Button")) {
+        workBtn = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("About_Button")) {
+        aboutBtn = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Contact_Button")) {
+        contactBtn = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Boba")) {
+        boba = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("GitHub")) {
+        github = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("LinkeIn")) {
+        linkedin = child;
+        child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Instagram")) {
+        insta = child;
+        child.scale.set(0, 0, 0);
       }
 
       if (child.name === "computer_Screen") {
@@ -271,10 +335,32 @@ gltfLoader.load(
     glb.scene.position.sub(center);
 
     scene.add(glb.scene);
+    setTimeout(playIntroAnimation, 100);
   },
   undefined,
   (error) => console.error("Error loading GLB:", error),
 );
+
+function playIntroAnimation() {
+  const t1 = gsap.timeline({ duration: 0.8, ease: "back.out(1.8)" });
+
+  // Animate scales up
+  if (plank1) t1.to(plank1.scale, { x: 1, z: 1 });
+  if (plank2) t1.to(plank2.scale, { x: 1, y: 1, z: 1 });
+  if (workBtn) t1.to(workBtn.scale, { x: 1, y: 1, z: 1 });
+  if (aboutBtn) t1.to(aboutBtn.scale, { x: 1, y: 1, z: 1 });
+  if (contactBtn) t1.to(contactBtn.scale, { x: 1, y: 1, z: 1 });
+
+  // Snap back to original scale after animation
+  t1.eventCallback("onComplete", () => {
+    [plank1, plank2, workBtn, aboutBtn, contactBtn].forEach((obj) => {
+      if (obj && obj.userData.initialScale) {
+        obj.scale.copy(obj.userData.initialScale);
+        console.log("🔄 Snapped back:", obj.name, obj.scale);
+      }
+    });
+  });
+}
 
 /* ===============
 == RESIZE ================= */
