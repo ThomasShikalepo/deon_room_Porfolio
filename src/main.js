@@ -1,6 +1,6 @@
 import "./style.scss";
 import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { OrbitControls } from "./utils/OrbitControls.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import gsap from "gsap";
@@ -49,8 +49,19 @@ document.querySelectorAll(".model-exit-button").forEach((button) => {
   );
 });
 
+let isModelOpen = false;
+
 const showModel = (model) => {
   model.style.display = "block";
+  isModelOpen = true;
+  controls.enabled = false;
+
+  if (currentHoveredObject) {
+    playHoverAnimation(currentHoveredObject, false);
+    currentHoveredObject = null;
+  }
+  document.body.style.cursor = "default";
+  currentIntersects = [];
 
   gsap.set(model, { opacity: 0 });
 
@@ -61,6 +72,8 @@ const showModel = (model) => {
 };
 
 const hideModel = (model) => {
+  isModelOpen = false;
+  controls.enabled = true;
   gsap.to(model, {
     opacity: 0,
     duration: 0.5,
@@ -91,6 +104,7 @@ window.addEventListener("mousemove", (event) => {
 window.addEventListener(
   "touchstart",
   (event) => {
+    if (isModelOpen) return;
     event.preventDefault();
     pointer.x = (event.touches[0].clientX / sizes.width) * 2 - 1;
     pointer.y = -(event.touches[0].clientY / sizes.height) * 2 + 1;
@@ -101,6 +115,7 @@ window.addEventListener(
 window.addEventListener(
   "touchend",
   (event) => {
+    if (isModelOpen) return;
     event.preventDefault();
     pointer.x = (event.changedTouches[0].clientX / sizes.width) * 2 - 1;
     pointer.y = -(event.changedTouches[0].clientY / sizes.height) * 2 + 1;
@@ -134,7 +149,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000,
 );
-camera.position.set(-4.877604882995123, -8.271879094271918, 9.847558929262831);
+camera.position.set(-7, -8.5, 11.5);
 
 /* ================= RENDERER ================= */
 const renderer = new THREE.WebGLRenderer({
@@ -146,18 +161,29 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 /* ================= CONTROLS ================= */
 const controls = new OrbitControls(camera, renderer.domElement);
+
+controls.minDistance = 6;
+controls.maxDistance = 18;
+controls.minPolarAngle = -Math.PI * 0.22;
+controls.maxPolarAngle = Math.PI / 2;
+
+controls.minAzimuthAngle = -Math.PI / 0.42;
+controls.maxAzimuthAngle = -0.57;
+
+console.log(controls.getAzimuthalAngle());
+
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.enableZoom = true;
-controls.minDistance = 0.5;
-controls.maxDistance = 50;
 
-controls.target.set(
-  -2.1994280240124406,
-  -10.324640060721578,
-  6.457151867306472,
-);
+controls.target.set(-2.2, -10.3, 6.45);
 controls.update();
+console.log(camera.position.distanceTo(controls.target));
+
+const targetMin = new THREE.Vector3(-3, -12, 4);
+const targetMax = new THREE.Vector3(1, -8, 8);
+
+const cameraMin = new THREE.Vector3(-8, -16, 4);
+const cameraMax = new THREE.Vector3(2, -6, 16);
 
 /* ================= LIGHT ================= */
 scene.add(new THREE.AmbientLight(0xffffff, 1));
@@ -220,6 +246,7 @@ gltfLoader.load(
           transmission: 1,
           opacity: 1,
           metalness: 0,
+          envMap: environmentMap,
           roughness: 0,
           ior: 1.5,
           thickness: 0.01,
@@ -301,6 +328,11 @@ function playHoverAnimation(object, isHovering) {
 const render = () => {
   controls.update();
 
+  controls.target.clamp(targetMin, targetMax);
+
+  // Clamp camera position
+  camera.position.clamp(cameraMin, cameraMax);
+
   yAxisFans.forEach((fan) => {
     fan.rotation.y += 0.08;
   });
@@ -309,35 +341,38 @@ const render = () => {
     fan.rotation.x += 0.08;
   });
 
-  raycaster.setFromCamera(pointer, camera);
-  currentIntersects = raycaster.intersectObjects(raycasterObject, true);
+  if (!isModelOpen) {
+    raycaster.setFromCamera(pointer, camera);
+    currentIntersects = raycaster.intersectObjects(raycasterObject, true);
 
-  if (currentIntersects.length > 0) {
-    const currentIntersectObject = currentIntersects[0].object;
+    if (currentIntersects.length > 0) {
+      const currentIntersectObject = currentIntersects[0].object;
 
-    if (currentIntersectObject.name.includes("Hover")) {
-      if (currentIntersectObject !== currentHoveredObject) {
-        if (currentHoveredObject) {
-          playHoverAnimation(currentHoveredObject, false);
+      if (currentIntersectObject.name.includes("Hover")) {
+        if (currentIntersectObject !== currentHoveredObject) {
+          if (currentHoveredObject) {
+            playHoverAnimation(currentHoveredObject, false);
+          }
+
+          playHoverAnimation(currentIntersectObject, true);
+          currentHoveredObject = currentIntersectObject;
         }
-
-        playHoverAnimation(currentIntersectObject, true);
-        currentHoveredObject = currentIntersectObject;
       }
-    }
 
-    if (currentIntersectObject.name.includes("Pointer")) {
-      document.body.style.cursor = "pointer";
+      if (currentIntersectObject.name.includes("Pointer")) {
+        document.body.style.cursor = "pointer";
+      } else {
+        document.body.style.cursor = "default";
+      }
     } else {
+      if (currentHoveredObject) {
+        playHoverAnimation(currentHoveredObject, false);
+        currentHoveredObject = null;
+      }
       document.body.style.cursor = "default";
     }
-  } else {
-    if (currentHoveredObject) {
-      playHoverAnimation(currentHoveredObject, false);
-      currentHoveredObject = null;
-    }
-    document.body.style.cursor = "default";
   }
+  controls.update();
 
   renderer.render(scene, camera);
   requestAnimationFrame(render);
