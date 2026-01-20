@@ -228,7 +228,7 @@ const environmentMap = new THREE.CubeTextureLoader()
 
 /* ================= LOAD GLB ================= */
 gltfLoader.load(
-  "/model/rom_compressed.glb",
+  "/model/wosh-v1.glb",
   (glb) => {
     glb.scene.traverse((child) => {
       if (!child.isMesh) return;
@@ -242,27 +242,25 @@ gltfLoader.load(
         child.userData.initialScale = child.scale.clone();
         child.userData.initialPosition = child.position.clone();
         child.userData.initialRotation = child.rotation.clone();
-        console.log(
-          "👆 Hover object found:",
-          child.name,
-          "initialScale:",
-          child.userData.initialScale,
-        );
       }
       // Buttons
       if (
         child.name.includes("My_Work_Button") ||
         child.name.includes("About_Button") ||
         child.name.includes("Contact_Button") ||
-        child.name.includes("Hanging_Plank")
+        child.name.includes("Hanging_Plank") ||
+        child.name.includes("Boba") ||
+        child.name.includes("GitHub") ||
+        child.name.includes("LinkedIn") ||
+        child.name.includes("Instagram")
       ) {
         child.userData.initialScale =
           child.userData.initialScale || child.scale.clone(); // ensure initialScale exists
         console.log(
           "📌 Button / Plank found:",
-          child.name,
+          child.name.includes("Boba"),
           "initialScale:",
-          child.userData.initialScale,
+          child.name.includes("Boba"),
         );
       }
       // Set initial scale for intro animation
@@ -281,13 +279,13 @@ gltfLoader.load(
       } else if (child.name.includes("Contact_Button")) {
         contactBtn = child;
         child.scale.set(0, 0, 0);
-      } else if (child.name.includes("Boba")) {
+      } else if (child.name.includes("Boba_Plushie_Fourth_Raycaster_Hover")) {
         boba = child;
         child.scale.set(0, 0, 0);
       } else if (child.name.includes("GitHub")) {
         github = child;
         child.scale.set(0, 0, 0);
-      } else if (child.name.includes("LinkeIn")) {
+      } else if (child.name.includes("LinkedIn")) {
         linkedin = child;
         child.scale.set(0, 0, 0);
       } else if (child.name.includes("Instagram")) {
@@ -340,27 +338,59 @@ gltfLoader.load(
 );
 
 function playIntroAnimation() {
-  const t1 = gsap.timeline({ duration: 0.8, ease: "back.out(1.8)" });
+  // ================= TIMELINE 1 (UI / PLANKS) =================
+  const t1 = gsap.timeline({
+    defaults: { duration: 0.8, ease: "back.out(1.8)" },
+  });
 
   t1.timeScale(0.8);
 
-  // Animate scales up
   if (plank1) t1.to(plank1.scale, { x: 1, z: 1 });
   if (plank2) t1.to(plank2.scale, { x: 1, y: 1, z: 1 }, "-=0.5");
-  if (workBtn) t1.to(workBtn.scale, { x: 0.5, y: 0.5, z: 0.5 });
-  if (aboutBtn) t1.to(aboutBtn.scale, { x: 0.4, y: 0.4, z: 0.4 });
-  if (contactBtn) t1.to(contactBtn.scale, { x: 0.5, y: 0.5, z: 0.5 });
 
-  // Snap back to original scale after animation
-  t1.eventCallback("onComplete", () => {
-    [plank1, plank2, workBtn, aboutBtn, contactBtn].forEach((obj) => {
-      if (obj && obj.userData.initialScale) {
-        obj.scale.copy(obj.userData.initialScale);
-        console.log("🔄 Snapped back:", obj.name, obj.scale);
-      }
+  if (workBtn) t1.to(workBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
+  if (aboutBtn) t1.to(aboutBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
+  if (contactBtn) (t1.to(contactBtn.scale, { x: 1, y: 1, z: 1 }), "-=0.6");
+
+  // ================= TIMELINE 2 (SOCIALS / BOBA) =================
+  const t2 = gsap.timeline({
+    defaults: { duration: 0.8, ease: "back.out(1.8)" },
+    delay: 0.25, // starts slightly after t1
+  });
+
+  if (boba) t2.to(boba.scale, { x: 1, y: 1, z: 1, delay: 0.4 }, "-=0.5");
+  if (github) t2.to(github.scale, { x: 1, y: 1, z: 1 }, "-=0.5");
+  if (linkedin) t2.to(linkedin.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
+  if (insta) t2.to(insta.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
+
+  // ================= SETTLE BACK (FOR BOTH) =================
+  t2.eventCallback("onComplete", settleBackToInitial);
+}
+
+function settleBackToInitial() {
+  [
+    plank1,
+    plank2,
+    workBtn,
+    aboutBtn,
+    contactBtn,
+    boba,
+    github,
+    linkedin,
+    insta,
+  ].forEach((obj) => {
+    if (!obj || !obj.userData.initialScale) return;
+
+    gsap.to(obj.scale, {
+      x: obj.userData.initialScale.x,
+      y: obj.userData.initialScale.y,
+      z: obj.userData.initialScale.z,
+      duration: 0.35,
+      ease: "power2.out",
     });
   });
 }
+
 /* ===============
 == RESIZE ================= */
 window.addEventListener("resize", () => {
