@@ -24,6 +24,26 @@ export default class World {
     this.linkedin = null;
     this.insta = null;
 
+    this.frame1 = null;
+    this.frame2 = null;
+    this.frame3 = null;
+
+    this.headPhone = null;
+    this.flowers = [];
+    this.tableLamp = null;
+    this.boxs = [];
+    this.books = [];
+    this.totoro = null;
+    this.flowerBusket = null;
+    this.pets = [];
+    this.calender = null;
+
+    this.mic = null;
+    this.slipper_1 = null;
+    this.slipper_2 = null;
+    this.keyboardKeys = [];
+    this.coffee = null;
+
     this.sizes = {
       width: window.innerWidth,
       height: window.innerHeight,
@@ -86,9 +106,12 @@ export default class World {
   }
 
   loadModel() {
-    this.gltfLoader.load("/model/wosh-v1.glb", (glb) => {
+    this.gltfLoader.load("/model/room.glb", (glb) => {
       glb.scene.traverse((child) => {
         if (!child.isMesh) return;
+        if (child.isMesh && child.name.includes("Keyboard")) {
+          console.log("FOUND:", child.name);
+        }
 
         if (child.name.includes("Pointer")) {
           this.raycasterObject.push(child);
@@ -129,6 +152,101 @@ export default class World {
           child.scale.set(0, 0, 0);
         }
 
+        if (child.name.includes("Basket")) {
+          this.flowerBusket = child;
+          child.scale.set(0, 0, 0);
+        }
+        if (child.name.includes("Coffee")) {
+          this.coffee = child;
+          child.scale.set(0, 0, 0);
+        }
+
+        if (child.name.includes("Totoro")) {
+          this.totoro = child;
+          child.scale.set(0, 0, 0);
+        }
+
+        if (child.name.includes("Calender")) {
+          this.calender = child;
+          child.scale.set(0, 0, 0);
+        }
+
+        if (child.name.includes("Microphone")) {
+          this.Microphone = child;
+          child.scale.set(0, 0, 0);
+        }
+
+        if (child.name.includes("Frame_1_Second")) {
+          this.frame1 = child;
+          child.scale.set(0, 0, 0);
+          console.log("Frame 1 loaded:", this.frame1);
+        }
+        if (child.name.includes("Frame_2_Second")) {
+          this.frame2 = child;
+          child.scale.set(0, 0, 0);
+        }
+        if (child.name.includes("Frame_3_Second")) {
+          this.frame3 = child;
+          child.scale.set(0, 0, 0);
+        }
+
+        if (child.name.includes("Slipper_1")) {
+          this.slipper_1 = child;
+          child.scale.set(0, 0, 0);
+          console.log("Frame 2 loaded:", this.frame2);
+        }
+        if (child.name.includes("Slipper_2")) {
+          this.slipper_2 = child;
+          child.scale.set(0, 0, 0);
+        }
+        if (child.name.includes("Headphones")) {
+          this.headPhone = child;
+          child.scale.set(0, 0, 0);
+        }
+        if (child.name.includes("TableLamp")) {
+          this.tableLamp = child;
+          child.scale.set(0, 0, 0);
+        }
+        if (
+          child.name.includes("Flower_") &&
+          child.name.includes("_Fourth_Raycaster_Hover")
+        ) {
+          this.flowers.push(child);
+          child.scale.set(0, 0, 0);
+        }
+
+        if (
+          child.name.includes("MrRabbit_") &&
+          child.name.includes("_Raycaster_Hover_Fourth")
+        ) {
+          this.pets.push(child);
+          child.scale.set(0, 0, 0);
+        }
+
+        if (
+          child.name.startsWith("Keyboard_") &&
+          child.name.includes("_Fourth_Raycaster_Hover")
+        ) {
+          this.keyboardKeys.push(child);
+          child.scale.set(0, 0, 0);
+        }
+
+        if (
+          child.name.startsWith("Book_") &&
+          child.name.includes("_Fourth_Hover_Raycaster")
+        ) {
+          this.books.push(child);
+          child.scale.set(0, 0, 0);
+        }
+
+        if (
+          child.name.startsWith("Box_") &&
+          child.name.includes("_Hover_Fourth_Raycaster")
+        ) {
+          this.boxs.push(child);
+          child.scale.set(0, 0, 0);
+        }
+
         if (child.name === "computer_Screen") {
           child.material = new THREE.MeshStandardMaterial({
             map: this.videoTexture,
@@ -165,68 +283,179 @@ export default class World {
       const center = box.getCenter(new THREE.Vector3());
       glb.scene.position.sub(center);
 
+      // 🔑 KEYBOARD — FIX STRING SORT ORDER
+      this.keyboardKeys.sort((a, b) => {
+        const aNum = parseInt(a.name.match(/\d+/)[0]);
+        const bNum = parseInt(b.name.match(/\d+/)[0]);
+        return aNum - bNum;
+      });
+
       this.scene.add(glb.scene);
+
       setTimeout(() => this.playIntroAnimation(), 100);
     });
   }
 
   playIntroAnimation() {
-    const t1 = gsap.timeline({
+    const timeline = gsap.timeline({
       defaults: { duration: 0.8, ease: "back.out(1.8)" },
     });
 
-    t1.timeScale(0.8);
+    timeline.timeScale(0.8);
 
-    if (this.plank1) t1.to(this.plank1.scale, { x: 1, z: 1 });
-    if (this.plank2) t1.to(this.plank2.scale, { x: 1, y: 1, z: 1 }, "-=0.5");
+    // Planks
+    if (this.plank1) timeline.to(this.plank1.scale, { x: 1, z: 1 });
+    if (this.plank2)
+      timeline.to(this.plank2.scale, { x: 1, y: 1, z: 1 }, "-=0.5");
 
-    if (this.workBtn) t1.to(this.workBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
+    // Buttons
+    if (this.workBtn)
+      timeline.to(this.workBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
     if (this.aboutBtn)
-      t1.to(this.aboutBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
+      timeline.to(this.aboutBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
     if (this.contactBtn)
-      t1.to(this.contactBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
+      timeline.to(this.contactBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
 
-    const t2 = gsap.timeline({
-      defaults: { duration: 0.8, ease: "back.out(1.8)" },
-      delay: 0.25,
-    });
+    if (this.coffee)
+      timeline.to(this.coffee.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
 
+    // Socials / Boba
     if (this.boba)
-      t2.to(this.boba.scale, { x: 1, y: 1, z: 1, delay: 0.4 }, "-=0.5");
-    if (this.github) t2.to(this.github.scale, { x: 1, y: 1, z: 1 }, "-=0.5");
+      timeline.to(this.boba.scale, { x: 1, y: 1, z: 1, delay: 0.4 }, "-=0.5");
+    if (this.github)
+      timeline.to(this.github.scale, { x: 1, y: 1, z: 1 }, "-=0.5");
     if (this.linkedin)
-      t2.to(this.linkedin.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
-    if (this.insta) t2.to(this.insta.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
+      timeline.to(this.linkedin.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
+    if (this.insta)
+      timeline.to(this.insta.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
 
-    t2.eventCallback("onComplete", () => this.settleBackToInitial());
-  }
+    // Frames
+    if (this.frame1)
+      timeline.to(this.frame1.scale, { x: 1, y: 1, z: 1 }, "-=0.5");
+    if (this.frame2)
+      timeline.to(this.frame2.scale, { x: 1, y: 1, z: 1 }, "-=0.5");
+    if (this.frame3)
+      timeline.to(this.frame3.scale, { x: 1, y: 1, z: 1 }, "-=0.5");
 
-  settleBackToInitial() {
-    [
-      this.plank1,
-      this.plank2,
-      this.workBtn,
-      this.aboutBtn,
-      this.contactBtn,
-      this.boba,
-      this.github,
-      this.linkedin,
-      this.insta,
-    ].forEach((obj) => {
-      if (!obj || !obj.userData.initialScale) return;
+    if (this.calender)
+      timeline.to(this.calender.scale, { x: 1, y: 1, z: 1 }, "-=0.5");
 
-      gsap.to(obj.scale, {
-        x: obj.userData.initialScale.x,
-        y: obj.userData.initialScale.y,
-        z: obj.userData.initialScale.z,
-        duration: 0.35,
-        ease: "power2.out",
-      });
+    const tSlippers = gsap.timeline({
+      defaults: {
+        duration: 0.8,
+        ease: "back.out(1.8)",
+      },
     });
+    tSlippers.timeScale(0.8);
+
+    if (this.slipper_1)
+      timeline.to(this.slipper_1.scale, { x: 1, y: 1, z: 1, delay: 0.5 });
+    if (this.slipper_2)
+      timeline.to(this.slipper_2.scale, { x: 1, y: 1, z: 1 }, "-=0.5");
+    if (this.headPhone)
+      timeline.to(this.headPhone.scale, { x: 1, y: 1, z: 1 }, "-=0.8");
+
+    if (this.tableLamp)
+      timeline.to(this.tableLamp.scale, { x: 1, y: 1, z: 1 }, "-=0.8");
+
+    if (this.flowerBusket)
+      timeline.to(this.flowerBusket.scale, { x: 1, y: 1, z: 1 }, "-=0.8");
+
+    if (this.totoro)
+      timeline.to(this.totoro.scale, { x: 1, y: 1, z: 1 }, "-=0.8");
+
+    if (this.mic) timeline.to(this.mic.scale, { x: 1, y: 1, z: 1 }, "-=0.8");
+
+    // 🔑 KEYBOARD INTRO ANIMATION
+    if (this.keyboardKeys.length) {
+      timeline.to(
+        this.keyboardKeys.map((key) => key.scale),
+        {
+          x: 1,
+          y: 1,
+          z: 1,
+          stagger: {
+            each: 0.03,
+            from: "start",
+          },
+          ease: "back.out(2)",
+        },
+        "-=0.3",
+      );
+    }
+
+    if (this.boxs.length) {
+      timeline.to(
+        this.boxs.map((box) => box.scale),
+        {
+          x: 1,
+          y: 1,
+          z: 1,
+          stagger: {
+            each: 0.03,
+            from: "start",
+          },
+          ease: "back.out(2)",
+        },
+        "-=0.3",
+      );
+    }
+
+    if (this.flowers.length) {
+      timeline.to(
+        this.flowers.map((flower) => flower.scale),
+        {
+          x: 1,
+          y: 1,
+          z: 1,
+          stagger: {
+            each: 0.03,
+            from: "start",
+          },
+          ease: "back.out(2)",
+        },
+        "-=0.3",
+      );
+    }
+
+    if (this.pets.length) {
+      timeline.to(
+        this.pets.map((pet) => pet.scale),
+        {
+          x: 1,
+          y: 1,
+          z: 1,
+          stagger: {
+            each: 0.03,
+            from: "start",
+          },
+          ease: "back.out(2)",
+        },
+        "-=0.3",
+      );
+    }
+
+    if (this.books.length) {
+      timeline.to(
+        this.books.map((book) => book.scale),
+        {
+          x: 1,
+          y: 1,
+          z: 1,
+          stagger: {
+            each: 0.03,
+            from: "start",
+          },
+          ease: "back.out(2)",
+        },
+        "-=0.3",
+      );
+    }
   }
 
   resize = () => {
     this.sizes.width = window.innerWidth;
+    SVGAElement;
     this.sizes.height = window.innerHeight;
 
     this.camera.aspect = this.sizes.width / this.sizes.height;
