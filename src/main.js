@@ -21,6 +21,10 @@ let chairTop;
 let nameLatters = [];
 let hourHand;
 let minuteHand;
+let sofa = [];
+let plants = [];
+let pictureFrames = [];
+let pillows = [];
 
 let workBtn, aboutBtn, contactBtn, github, linkedin, insta;
 
@@ -170,7 +174,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 const controls = new OrbitControls(camera, renderer.domElement);
 
 controls.minDistance = 6;
-controls.maxDistance = 18;
+controls.maxDistance = 50;
 
 controls.target.set(2.789303142482967, -15.121523035050409, 0.8168493703113104);
 controls.update();
@@ -270,21 +274,48 @@ gltfLoader.load(
         });
       }
 
-      if (child.name.includes("Glass")) {
+      if (
+        child.name.includes("Glass") ||
+        child.name.includes === "Coffe_table_Glass"
+      ) {
         child.material = new THREE.MeshPhysicalMaterial({
           transmission: 1,
+          transparent: true,
           opacity: 1,
+          color: 0xfbfbfb,
           metalness: 0,
-          envMap: environmentMap,
           roughness: 0,
-          ior: 1.5,
+          ior: 3,
           thickness: 0.01,
           specularIntensity: 1,
+          envMap: environmentMap,
+          envMapIntensity: 1,
+          depthWrite: false,
+          specularColor: 0xfbfbfb,
         });
       }
 
       if (child.name.includes("Name_Letter")) {
         nameLatters.push(child);
+        child.scale.set(0, 0, 0);
+      }
+
+      if (child.name.includes("Plant")) {
+        plants.push(child);
+        child.scale.set(0, 0, 0);
+      }
+
+      if (child.name.includes("Sofa")) {
+        sofa.push(child);
+        child.scale.set(0, 0, 0);
+      }
+
+      if (child.name.includes("Pillow")) {
+        pillows.push(child);
+        child.scale.set(0, 0, 0);
+      }
+      if (child.name.includes("Frame")) {
+        pictureFrames.push(child);
         child.scale.set(0, 0, 0);
       }
 
@@ -313,62 +344,103 @@ gltfLoader.load(
   (error) => console.error("Error loading GLB:", error),
 );
 
+function scaleIn({
+  items = [],
+  duration = 0.8,
+  ease = "back.out(1.8)",
+  stagger = 0,
+}) {
+  if (!items.length) return null;
+
+  return gsap.to(
+    items.map((item) => item.scale),
+    { x: 1, y: 1, z: 1, duration, ease, stagger },
+  );
+}
+
 function playIntroAnimation() {
   const master = gsap.timeline();
 
-  // ================= UI  =================
-  const t1 = gsap.timeline({
+  // ================= UI =================
+  const uiTL = gsap.timeline({
     defaults: { duration: 0.8, ease: "back.out(1.8)" },
   });
 
-  t1.timeScale(0.8);
+  uiTL.timeScale(0.8);
 
-  if (workBtn) t1.to(workBtn.scale, { x: 1, y: 1, z: 1 }, 0);
-  if (aboutBtn) t1.to(aboutBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
-  if (contactBtn) t1.to(contactBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
+  if (workBtn) uiTL.to(workBtn.scale, { x: 1, y: 1, z: 1 }, 0);
+  if (aboutBtn) uiTL.to(aboutBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
+  if (contactBtn) uiTL.to(contactBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
 
-  // ================= SOCIALS + KEYS =================
-  const t2 = gsap.timeline({
+  // ================= SOCIALS =================
+  const socialsTL = gsap.timeline({
     defaults: { duration: 0.8, ease: "back.out(1.8)" },
   });
 
-  if (github) t2.to(github.scale, { x: 1, y: 1, z: 1 }, 0);
-  if (linkedin) t2.to(linkedin.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
-  if (insta) t2.to(insta.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
+  if (github) socialsTL.to(github.scale, { x: 1, y: 1, z: 1 }, 0);
+  if (linkedin) socialsTL.to(linkedin.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
+  if (insta) socialsTL.to(insta.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
+
+  // ================= KEYBOARD (explicit!) =================
+  const keyboardTL = gsap.timeline({
+    defaults: { duration: 0.6, ease: "back.out(2)" },
+  });
 
   if (keyboardKeys.length) {
-    t2.to(
+    keyboardTL.to(
       keyboardKeys.map((key) => key.scale),
       {
         x: 1,
         y: 1,
         z: 1,
         stagger: 0.03,
-        ease: "back.out(2)",
       },
-      "-=0.2",
     );
   }
 
   // ================= NAME LETTERS =================
-  const t3 = gsap.timeline({
+  const nameTL = gsap.timeline({
     defaults: { duration: 0.6, ease: "back.out(2)" },
   });
 
   if (nameLatters.length) {
-    t3.to(
+    nameTL.to(
       nameLatters.map((letter) => letter.scale),
       {
         x: 1,
         y: 1,
         z: 1,
-        stagger: 0.04,
+        stagger: 0.1,
       },
     );
   }
 
-  // ================= MASTER SEQUENCE =================
-  master.add(t1).add(t2, "-=0.3").add(t3, "-=0.4");
+  // ================= SCENE OBJECTS =================
+  const sceneTL = gsap.timeline({
+    defaults: { duration: 0.6, ease: "back.out(2)" },
+  });
+
+  const sceneItems = [...plants, ...sofa, ...pillows, ...pictureFrames];
+
+  if (sceneItems.length) {
+    sceneTL.to(
+      sceneItems.map((obj) => obj.scale),
+      {
+        x: 1,
+        y: 1,
+        z: 1,
+        stagger: 0.06,
+      },
+    );
+  }
+
+  // ================= MASTER =================
+  master
+    .add(sceneTL) // 👈 FIRST
+    .add(uiTL, "-=0.3")
+    .add(socialsTL, "-=0.3")
+    .add(keyboardTL, "-=0.2")
+    .add(nameTL, "-=0.4");
 }
 
 /* ===============
@@ -433,8 +505,8 @@ const updateClockHands = () => {
   const minuteAngle = (minutes + seconds / 60) * ((Math.PI * 2) / 60);
   const hourAngle = (hours + minutes / 60) * ((Math.PI * 2) / 12);
 
-  minuteHand.rotation.x = -minuteAngle;
-  hourHand.rotation.x = -hourAngle;
+  minuteHand.rotation.y = -minuteAngle;
+  hourHand.rotation.y = -hourAngle;
 };
 
 /* ================= ANIMATE ================= */
