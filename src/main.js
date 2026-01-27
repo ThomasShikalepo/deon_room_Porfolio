@@ -18,7 +18,7 @@ const raycasterObject = [];
 let currentIntersects = [];
 let keyboardKeys = [];
 let chairTop;
-
+let nameLatters = [];
 let hourHand;
 let minuteHand;
 
@@ -234,7 +234,7 @@ gltfLoader.load(
         child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
       }
 
-      if (child.name.includes("Minute_Hand")) {
+      if (child.name.includes("minute_Hand")) {
         minuteHand = child;
         child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
       }
@@ -257,7 +257,7 @@ gltfLoader.load(
       } else if (child.name.includes("Instagram")) {
         insta = child;
         child.scale.set(0, 0, 0);
-      } else if (child.name.includes("Keys")) {
+      } else if (child.name.includes("Keycaps")) {
         keyboardKeys.push(child);
         child.scale.set(0, 0, 0);
       }
@@ -270,7 +270,7 @@ gltfLoader.load(
         });
       }
 
-      if (child.name.includes("GGlass")) {
+      if (child.name.includes("Glass")) {
         child.material = new THREE.MeshPhysicalMaterial({
           transmission: 1,
           opacity: 1,
@@ -280,9 +280,12 @@ gltfLoader.load(
           ior: 1.5,
           thickness: 0.01,
           specularIntensity: 1,
-          specularColor: 0xffffff,
-          envMapIntensity: 1,
         });
+      }
+
+      if (child.name.includes("Name_Letter")) {
+        nameLatters.push(child);
+        child.set(0, 0, 0);
       }
 
       if (child.name.includes("FAN")) {
@@ -322,10 +325,9 @@ function playIntroAnimation() {
   if (aboutBtn) t1.to(aboutBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
   if (contactBtn) (t1.to(contactBtn.scale, { x: 1, y: 1, z: 1 }), "-=0.6");
 
-  // ================= TIMELINE 2 (SOCIALS / BOBA) =================
   const t2 = gsap.timeline({
     defaults: { duration: 0.8, ease: "back.out(1.8)" },
-    delay: 0.25, // starts slightly after t1
+    delay: 0.25,
   });
 
   if (github) t2.to(github.scale, { x: 1, y: 1, z: 1 }, "-=0.5");
@@ -333,9 +335,33 @@ function playIntroAnimation() {
   if (insta) t2.to(insta.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
 
   if (keyboardKeys.length) {
-    timeline.to(
-      keyboardKeys.map((keys) => keyboardKeys.scale),
-      { x: 1, y: 1, z: 1, stagger: { each: 0.03 }, ease: "back.out(2)" },
+    t2.to(
+      keyboardKeys.map((key) => key.scale),
+      {
+        x: 1,
+        y: 1,
+        z: 1,
+        stagger: 0.03,
+        ease: "back.out(2)",
+      },
+      "-=0.2",
+    );
+  }
+
+  const t3 = gsap.timeline({
+    defaults: { duration: 0.8, ease: "back.out(1.8)" },
+    delay: 0.25,
+  });
+  if (nameLatters.length) {
+    t3.to(
+      nameLatters.map((key) => key.scale),
+      {
+        x: 1,
+        y: 1,
+        z: 1,
+        stagger: 0.03,
+        ease: "back.out(2)",
+      },
       "-=0.2",
     );
   }
