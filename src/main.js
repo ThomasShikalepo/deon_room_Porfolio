@@ -10,22 +10,19 @@ const canvas = document.querySelector("#experience-canvas");
 /* ================= SCENE ================= */
 const scene = new THREE.Scene();
 
-const yAxisFans = [];
 const xAxisFans = [];
+const yAxisFans = [];
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 const raycasterObject = [];
 let currentIntersects = [];
+let keyboardKeys = [];
+let chairTop;
 
-let plank1,
-  plank2,
-  workBtn,
-  aboutBtn,
-  contactBtn,
-  boba,
-  github,
-  linkedin,
-  insta;
+let hourHand;
+let minuteHand;
+
+let workBtn, aboutBtn, contactBtn, github, linkedin, insta;
 
 let currentHoveredObject = null;
 
@@ -159,7 +156,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000,
 );
-camera.position.set(-7, -8.5, 11.5);
+camera.position.set(16.43126761931179, -6.623764458735895, 8.921471779258786);
 
 /* ================= RENDERER ================= */
 const renderer = new THREE.WebGLRenderer({
@@ -174,26 +171,9 @@ const controls = new OrbitControls(camera, renderer.domElement);
 
 controls.minDistance = 6;
 controls.maxDistance = 18;
-controls.minPolarAngle = -Math.PI * 0.22;
-controls.maxPolarAngle = Math.PI / 2;
 
-controls.minAzimuthAngle = -Math.PI / 0.42;
-controls.maxAzimuthAngle = -0.57;
-
-console.log(controls.getAzimuthalAngle());
-
-controls.enableDamping = true;
-controls.dampingFactor = 0.05;
-
-controls.target.set(-2.2, -10.3, 6.45);
+controls.target.set(2.789303142482967, -15.121523035050409, 0.8168493703113104);
 controls.update();
-console.log(camera.position.distanceTo(controls.target));
-
-const targetMin = new THREE.Vector3(-3, -12, 4);
-const targetMax = new THREE.Vector3(1, -8, 8);
-
-const cameraMin = new THREE.Vector3(-8, -16, 4);
-const cameraMax = new THREE.Vector3(2, -6, 16);
 
 /* ================= LIGHT ================= */
 scene.add(new THREE.AmbientLight(0xffffff, 1));
@@ -208,7 +188,7 @@ videoElement.loop = true;
 videoElement.muted = true;
 videoElement.playsInline = true;
 videoElement.autoplay = true;
-videoElement.play().catch(() => {});
+videoElement.play();
 
 const videoTexture = new THREE.VideoTexture(videoElement);
 videoTexture.flipY = false;
@@ -228,7 +208,7 @@ const environmentMap = new THREE.CubeTextureLoader()
 
 /* ================= LOAD GLB ================= */
 gltfLoader.load(
-  "/model/wosh-v1.glb",
+  "/model/room-v1.glb",
   (glb) => {
     glb.scene.traverse((child) => {
       if (!child.isMesh) return;
@@ -243,34 +223,23 @@ gltfLoader.load(
         child.userData.initialPosition = child.position.clone();
         child.userData.initialRotation = child.rotation.clone();
       }
-      // Buttons
-      if (
-        child.name.includes("My_Work_Button") ||
-        child.name.includes("About_Button") ||
-        child.name.includes("Contact_Button") ||
-        child.name.includes("Hanging_Plank") ||
-        child.name.includes("Boba") ||
-        child.name.includes("GitHub") ||
-        child.name.includes("LinkedIn") ||
-        child.name.includes("Instagram")
-      ) {
-        child.userData.initialScale =
-          child.userData.initialScale || child.scale.clone(); // ensure initialScale exists
-        console.log(
-          "📌 Button / Plank found:",
-          child.name.includes("Boba"),
-          "initialScale:",
-          child.name.includes("Boba"),
-        );
+
+      if (child.name.includes("Chair_Top")) {
+        chairTop = child;
+        child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
       }
-      // Set initial scale for intro animation
-      if (child.name.includes("Hanging_Plank_1")) {
-        plank1 = child;
-        child.scale.set(0, 0, 1);
-      } else if (child.name.includes("Hanging_Plank_2")) {
-        plank2 = child;
-        child.scale.set(0, 0, 0);
-      } else if (child.name.includes("My_Work_Button")) {
+
+      if (child.name.includes("Hour_Hand")) {
+        hourHand = child;
+        child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
+      }
+
+      if (child.name.includes("Minute_Hand")) {
+        minuteHand = child;
+        child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
+      }
+
+      if (child.name.includes("My_Work_Button")) {
         workBtn = child;
         child.scale.set(0, 0, 0);
       } else if (child.name.includes("About_Button")) {
@@ -278,9 +247,6 @@ gltfLoader.load(
         child.scale.set(0, 0, 0);
       } else if (child.name.includes("Contact_Button")) {
         contactBtn = child;
-        child.scale.set(0, 0, 0);
-      } else if (child.name.includes("Boba_Plushie_Fourth_Raycaster_Hover")) {
-        boba = child;
         child.scale.set(0, 0, 0);
       } else if (child.name.includes("GitHub")) {
         github = child;
@@ -291,9 +257,12 @@ gltfLoader.load(
       } else if (child.name.includes("Instagram")) {
         insta = child;
         child.scale.set(0, 0, 0);
+      } else if (child.name.includes("Keys")) {
+        keyboardKeys.push(child);
+        child.scale.set(0, 0, 0);
       }
 
-      if (child.name === "computer_Screen") {
+      if (child.name.includes("Screen")) {
         child.material = new THREE.MeshStandardMaterial({
           map: videoTexture,
           roughness: 0.5,
@@ -301,7 +270,7 @@ gltfLoader.load(
         });
       }
 
-      if (child.name.includes("Computer_Glass")) {
+      if (child.name.includes("GGlass")) {
         child.material = new THREE.MeshPhysicalMaterial({
           transmission: 1,
           opacity: 1,
@@ -316,11 +285,15 @@ gltfLoader.load(
         });
       }
 
-      if (child.name.includes("Computer_Fan_")) {
-        if (child.name.includes("4_") || child.name.includes("5_")) {
-          yAxisFans.push(child);
-        } else {
+      if (child.name.includes("FAN")) {
+        if (
+          child.name.includes("1") ||
+          child.name.includes("2") ||
+          child.name.includes("3")
+        ) {
           xAxisFans.push(child);
+        } else {
+          yAxisFans.push(child);
         }
       }
     });
@@ -345,9 +318,6 @@ function playIntroAnimation() {
 
   t1.timeScale(0.8);
 
-  if (plank1) t1.to(plank1.scale, { x: 1, z: 1 });
-  if (plank2) t1.to(plank2.scale, { x: 1, y: 1, z: 1 }, "-=0.5");
-
   if (workBtn) t1.to(workBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
   if (aboutBtn) t1.to(aboutBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
   if (contactBtn) (t1.to(contactBtn.scale, { x: 1, y: 1, z: 1 }), "-=0.6");
@@ -358,37 +328,17 @@ function playIntroAnimation() {
     delay: 0.25, // starts slightly after t1
   });
 
-  if (boba) t2.to(boba.scale, { x: 1, y: 1, z: 1, delay: 0.4 }, "-=0.5");
   if (github) t2.to(github.scale, { x: 1, y: 1, z: 1 }, "-=0.5");
   if (linkedin) t2.to(linkedin.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
   if (insta) t2.to(insta.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
 
-  // ================= SETTLE BACK (FOR BOTH) =================
-  t2.eventCallback("onComplete", settleBackToInitial);
-}
-
-function settleBackToInitial() {
-  [
-    plank1,
-    plank2,
-    workBtn,
-    aboutBtn,
-    contactBtn,
-    boba,
-    github,
-    linkedin,
-    insta,
-  ].forEach((obj) => {
-    if (!obj || !obj.userData.initialScale) return;
-
-    gsap.to(obj.scale, {
-      x: obj.userData.initialScale.x,
-      y: obj.userData.initialScale.y,
-      z: obj.userData.initialScale.z,
-      duration: 0.35,
-      ease: "power2.out",
-    });
-  });
+  if (keyboardKeys.length) {
+    timeline.to(
+      keyboardKeys.map((keys) => keyboardKeys.scale),
+      { x: 1, y: 1, z: 1, stagger: { each: 0.03 }, ease: "back.out(2)" },
+      "-=0.2",
+    );
+  }
 }
 
 /* ===============
@@ -439,22 +389,42 @@ function playHoverAnimation(object, isHovering) {
     });
   }
 }
+
+const clock = new THREE.Clock();
+
+const updateClockHands = () => {
+  if (!hourHand || !minuteHand) return;
+
+  const now = new Date();
+  const hours = now.getHours() % 12;
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+};
+
 /* ================= ANIMATE ================= */
-const render = () => {
+const render = (timestamp) => {
   controls.update();
 
-  controls.target.clamp(targetMin, targetMax);
-
-  // Clamp camera position
-  camera.position.clamp(cameraMin, cameraMax);
+  xAxisFans.forEach((fan) => {
+    fan.rotation.x += 0.08;
+  });
 
   yAxisFans.forEach((fan) => {
     fan.rotation.y += 0.08;
   });
 
-  xAxisFans.forEach((fan) => {
-    fan.rotation.x += 0.08;
-  });
+  // chair Animation
+  if (chairTop) {
+    const time = timestamp * 0.001;
+    const baseAmplitude = Math.PI / 8;
+
+    const rotationOffset =
+      baseAmplitude *
+      Math.sin(time * 1.0) *
+      (1 - Math.abs(Math.sin(time * 0.5)) * 0.3);
+
+    chairTop.rotation.y = chairTop.userData.initialRotation.y + rotationOffset;
+  }
 
   if (!isModelOpen) {
     raycaster.setFromCamera(pointer, camera);
@@ -488,6 +458,10 @@ const render = () => {
     }
   }
   controls.update();
+
+  // console.log(camera.position);
+  // console.log("##########################");
+  // console.log(controls.target);
 
   renderer.render(scene, camera);
   requestAnimationFrame(render);
