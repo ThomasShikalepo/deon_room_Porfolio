@@ -399,11 +399,20 @@ const updateClockHands = () => {
   const hours = now.getHours() % 12;
   const minutes = now.getMinutes();
   const seconds = now.getSeconds();
+
+  const minuteAngle = (minutes + seconds / 60) * ((Math.PI * 2) / 60);
+  const hourAngle = (hours + minutes / 60) * ((Math.PI * 2) / 12);
+
+  minuteHand.rotation.x = -minuteAngle;
+  hourHand.rotation.x = -hourAngle;
 };
 
 /* ================= ANIMATE ================= */
 const render = (timestamp) => {
   controls.update();
+
+  // Update Clock hand rotation
+  updateClockHands();
 
   xAxisFans.forEach((fan) => {
     fan.rotation.x += 0.08;
