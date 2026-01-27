@@ -285,7 +285,7 @@ gltfLoader.load(
 
       if (child.name.includes("Name_Letter")) {
         nameLatters.push(child);
-        child.set(0, 0, 0);
+        child.scale.set(0, 0, 0);
       }
 
       if (child.name.includes("FAN")) {
@@ -314,23 +314,25 @@ gltfLoader.load(
 );
 
 function playIntroAnimation() {
-  // ================= TIMELINE 1 (UI / PLANKS) =================
+  const master = gsap.timeline();
+
+  // ================= UI  =================
   const t1 = gsap.timeline({
     defaults: { duration: 0.8, ease: "back.out(1.8)" },
   });
 
   t1.timeScale(0.8);
 
-  if (workBtn) t1.to(workBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
+  if (workBtn) t1.to(workBtn.scale, { x: 1, y: 1, z: 1 }, 0);
   if (aboutBtn) t1.to(aboutBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
-  if (contactBtn) (t1.to(contactBtn.scale, { x: 1, y: 1, z: 1 }), "-=0.6");
+  if (contactBtn) t1.to(contactBtn.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
 
+  // ================= SOCIALS + KEYS =================
   const t2 = gsap.timeline({
     defaults: { duration: 0.8, ease: "back.out(1.8)" },
-    delay: 0.25,
   });
 
-  if (github) t2.to(github.scale, { x: 1, y: 1, z: 1 }, "-=0.5");
+  if (github) t2.to(github.scale, { x: 1, y: 1, z: 1 }, 0);
   if (linkedin) t2.to(linkedin.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
   if (insta) t2.to(insta.scale, { x: 1, y: 1, z: 1 }, "-=0.6");
 
@@ -348,23 +350,25 @@ function playIntroAnimation() {
     );
   }
 
+  // ================= NAME LETTERS =================
   const t3 = gsap.timeline({
-    defaults: { duration: 0.8, ease: "back.out(1.8)" },
-    delay: 0.25,
+    defaults: { duration: 0.6, ease: "back.out(2)" },
   });
+
   if (nameLatters.length) {
     t3.to(
-      nameLatters.map((key) => key.scale),
+      nameLatters.map((letter) => letter.scale),
       {
         x: 1,
         y: 1,
         z: 1,
-        stagger: 0.03,
-        ease: "back.out(2)",
+        stagger: 0.04,
       },
-      "-=0.2",
     );
   }
+
+  // ================= MASTER SEQUENCE =================
+  master.add(t1).add(t2, "-=0.3").add(t3, "-=0.4");
 }
 
 /* ===============
