@@ -1,4 +1,7 @@
 import "./style.scss";
+
+import { Howl } from "howler";
+
 import * as THREE from "three";
 import { OrbitControls } from "./utils/OrbitControls.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
@@ -25,6 +28,45 @@ let sofa = [];
 let plants = [];
 let pictureFrames = [];
 let pillows = [];
+const overlay = document.querySelector(".overlay");
+const MUSIC_FADE_TIME = 500;
+let isMusicFaded = false;
+const BACKGROUND_MUSIC_VOLUME = 1;
+const FADE_VOLUME = 0;
+
+const backgroundMusic = new Howl({
+  src: ["/audio/music/song.ogg"],
+  loop: true,
+  volume: 1,
+});
+
+let isMuted = false;
+
+const fadeOutBackgroundMusic = () => {
+  if (!isMuted && !isMutedFaded) {
+    (backgroundMusic.fade(
+      backgroundMusic.volume(),
+      FADE_VOLUME,
+      MUSIC_FADE_TIME,
+    ),
+      (isMutedFaded = true));
+  }
+};
+
+const fadeInBackgroundMusic = () => {
+  if (!isMuted && isMusicFaded) {
+    backgroundMusic.fade(FADE_VOLUME, BACKGROUND_MUSIC_VOLUME, MUSIC_FADE_TIME);
+    isMutedFaded = false;
+  }
+};
+
+const buttonSounds = {
+  click: new Howl({
+    src: ["/audio/sfx/click/bubble.ogg"],
+    preload: true,
+    volume: 0.5,
+  }),
+};
 
 let workBtn, aboutBtn, contactBtn, github, linkedin, insta;
 
@@ -37,6 +79,18 @@ const model = {
 };
 
 let touchHappened = false;
+overlay.addEventListener(
+  "touchend",
+  (e) => {
+    touchHappened = true;
+    e.preventDefault();
+    const modal = document.querySelector('.modal[style*="display: block"]');
+    if (modal) hideModel(modal);
+  },
+  { passive: false },
+);
+
+const muteToggleButton = document.querySelector(".mute-toggle-button");
 
 document.querySelectorAll(".model-exit-button").forEach((button) => {
   button.addEventListener(
@@ -59,11 +113,12 @@ document.querySelectorAll(".model-exit-button").forEach((button) => {
     { passive: false },
   );
 });
-
 let isModelOpen = false;
 
 const showModel = (model) => {
   model.style.display = "block";
+  overlay.style.display = "block";
+
   isModelOpen = true;
   controls.enabled = false;
 
@@ -76,20 +131,44 @@ const showModel = (model) => {
 
   gsap.set(model, { opacity: 0 });
 
-  gsap.to(model, {
+  gsap.set(model, {
+    opacity: 0,
+    scale: 0,
+  });
+  gsap.set(overlay, {
+    opacity: 0,
+  });
+
+  gsap.to(overlay, {
     opacity: 1,
     duration: 0.5,
+  });
+
+  gsap.to(model, {
+    opacity: 1,
+    scale: 1,
+    duration: 0.5,
+    ease: "back.out(2)",
   });
 };
 
 const hideModel = (model) => {
   isModelOpen = false;
   controls.enabled = true;
-  gsap.to(model, {
+
+  gsap.to(overlay, {
     opacity: 0,
     duration: 0.5,
+  });
+
+  gsap.to(model, {
+    opacity: 0,
+    scale: 0,
+    duration: 0.5,
+    ease: "back.in(2)",
     onComplete: () => {
       model.style.display = "none";
+      overlay.style.display = "none";
     },
   });
 };
@@ -99,6 +178,77 @@ const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
 };
+
+const soundOffSvg = document.querySelector(".sound-off-svg");
+const soundOnSvg = document.querySelector(".sound-on-svg");
+
+const updateMutedState = (muted) => {
+  if (muted) {
+    backgroundMusic.volume(0);
+  } else {
+    backgroundMusic.volume(BACKGROUND_MUSIC_VOLUME);
+  }
+
+  buttonSounds.click.mute(muted);
+};
+
+const handleMuteToggle = (e) => {
+  e.preventDefault();
+
+  isMuted = !isMuted;
+  updateMutedState(isMuted);
+  buttonSounds.click.play();
+
+  if (!backgroundMusic.playing()) {
+    backgroundMusic.play();
+  }
+
+  gsap.to(muteToggleButton, {
+    rotate: -45,
+    scale: 5,
+    duration: 0.5,
+    ease: "back.out(2)",
+    onStart: () => {
+      if (!isMuted) {
+        soundOffSvg.style.display = "none";
+        soundOnSvg.style.display = "block";
+      } else {
+        soundOnSvg.style.display = "none";
+        soundOffSvg.style.display = "block";
+      }
+
+      gsap.to(muteToggleButton, {
+        rotate: 0,
+        scale: 1,
+        duration: 0.5,
+        ease: "back.out(2)",
+        onComplete: () => {
+          gsap.set(muteToggleButton, {
+            clearProps: "all",
+          });
+        },
+      });
+    },
+  });
+};
+
+muteToggleButton.addEventListener(
+  "click",
+  (e) => {
+    if (touchHappened) return;
+    handleMuteToggle(e);
+  },
+  { passive: false },
+);
+
+muteToggleButton.addEventListener(
+  "touchend",
+  (e) => {
+    touchHappened = true;
+    handleMuteToggle(e);
+  },
+  { passive: false },
+);
 
 const socialLinks = {
   GitHub: "https://github.com/ThomasShikalepo",
@@ -134,6 +284,103 @@ window.addEventListener(
   },
   { passive: false },
 );
+
+// Loadig Screen & Intro Animation
+
+const manager = new THREE.LoadingManager();
+
+const loadingScreen = document.querySelector(".loading-screen");
+const loadingScreenButton = document.querySelector(".loading-screen-button");
+const noSoundButton = document.querySelector(".no-sound-button");
+
+manager.onLoad = function () {
+  loadingScreenButton.style.border = "8px solid #2a0f4e";
+  loadingScreenButton.style.background = "#401d49";
+  loadingScreenButton.style.color = "#e6dede";
+  loadingScreenButton.style.boxShadow = "rgba(0, 0, 0, 0.24) 0px 3px 8px";
+  loadingScreenButton.textContent = "Enter!";
+  loadingScreenButton.style.cursor = "pointer";
+  loadingScreenButton.style.transition =
+    "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
+  let isDisabled = false;
+
+  noSoundButton.textContent = "Enter without Sound :(";
+
+  function handleEnter(withSound = true) {
+    if (isDisabled) return;
+
+    noSoundButton.textContent = "";
+    loadingScreenButton.style.cursor = "default";
+    loadingScreenButton.style.border = "8px solid #6e5e9c";
+    loadingScreenButton.style.background = "#ead7ef";
+    loadingScreenButton.style.color = "#6e5e9c";
+    loadingScreenButton.style.boxShadow = "none";
+    loadingScreenButton.textContent = "~ Hellow ~";
+    loadingScreen.style.background = "#ead7ef";
+    isDisabled = true;
+
+    if (!withSound) {
+      isMuted = true;
+      updateMutedState(true);
+
+      soundOnSvg.style.display = "none";
+      soundOffSvg.style.display = "block";
+    } else {
+      backgroundMusic.play();
+    }
+
+    playReveal();
+  }
+
+  loadingScreenButton.addEventListener("mouseenter", () => {
+    loadingScreenButton.style.transform = "scale(1.3)";
+  });
+
+  loadingScreenButton.addEventListener("touchend", (e) => {
+    touchHappened = true;
+    e.preventDefault();
+    handleEnter();
+  });
+
+  loadingScreenButton.addEventListener("click", (e) => {
+    if (touchHappened) return;
+    handleEnter(true);
+  });
+
+  loadingScreenButton.addEventListener("mouseleave", () => {
+    loadingScreenButton.style.transform = "none";
+  });
+
+  noSoundButton.addEventListener("click", (e) => {
+    if (touchHappened) return;
+    handleEnter(false);
+  });
+};
+
+function playReveal() {
+  const tl = gsap.timeline();
+
+  tl.to(loadingScreen, {
+    scale: 0.5,
+    duration: 1.2,
+    delay: 0.25,
+    ease: "back.in(1.8)",
+  }).to(
+    loadingScreen,
+    {
+      y: "200vh",
+      transform: "perspective(1000px) rotateX(45deg) rotateY(-35deg)",
+      duration: 1.2,
+      ease: "back.in(1.8)",
+      onComplete: () => {
+        isModelOpen = false;
+        playIntroAnimation();
+        loadingScreen.remove();
+      },
+    },
+    "-=0.1",
+  );
+}
 
 function handleRaycasterInteractions() {
   if (currentIntersects.length > 0) {
@@ -202,7 +449,7 @@ videoTexture.colorSpace = THREE.SRGBColorSpace;
 const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath("/draco/");
 
-const gltfLoader = new GLTFLoader();
+const gltfLoader = new GLTFLoader(manager);
 gltfLoader.setDRACOLoader(dracoLoader);
 
 const environmentMap = new THREE.CubeTextureLoader()
