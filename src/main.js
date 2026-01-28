@@ -84,8 +84,8 @@ overlay.addEventListener(
   (e) => {
     touchHappened = true;
     e.preventDefault();
-    const modal = document.querySelector('.modal[style*="display: block"]');
-    if (modal) hideModel(modal);
+    const model = document.querySelector('.model[style*="display: block"]');
+    if (model) hideModel(model);
   },
   { passive: false },
 );
