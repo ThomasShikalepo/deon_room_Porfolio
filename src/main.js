@@ -386,6 +386,9 @@ function handleRaycasterInteractions() {
   if (currentIntersects.length > 0) {
     const object = currentIntersects[0].object;
 
+    if (object.name.includes("Button")) {
+      buttonSounds.click.play();
+    }
     Object.entries(socialLinks).forEach(([key, url]) => {
       if (object.name.includes(key)) {
         window.open(url, "_blank", "noopener,noreferrer");
@@ -393,7 +396,7 @@ function handleRaycasterInteractions() {
     });
 
     if (object.name.includes("Work_Button")) showModel(model.work);
-    else if (object.name.includes("About_Button")) showModel(model.about);
+    else if (object.name.includes("About__Button")) showModel(model.about);
     else if (object.name.includes("Contact_Button")) showModel(model.contact);
   }
 }
@@ -493,7 +496,7 @@ gltfLoader.load(
       if (child.name.includes("My_Work_Button")) {
         workBtn = child;
         child.scale.set(0, 0, 0);
-      } else if (child.name.includes("About_Button")) {
+      } else if (child.name.includes("About__Button")) {
         aboutBtn = child;
         child.scale.set(0, 0, 0);
       } else if (child.name.includes("Contact_Button")) {
