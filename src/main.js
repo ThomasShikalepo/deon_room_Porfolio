@@ -425,6 +425,13 @@ const controls = new OrbitControls(camera, renderer.domElement);
 
 controls.minDistance = 6;
 controls.maxDistance = 50;
+controls.minPolarAngle = 0;
+controls.maxPolarAngle = Math.PI / 2;
+controls.minAzimuthAngle = 0;
+controls.maxAzimuthAngle = Math.PI / 2;
+
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
 
 controls.target.set(2.789303142482967, -15.121523035050409, 0.8168493703113104);
 controls.update();
