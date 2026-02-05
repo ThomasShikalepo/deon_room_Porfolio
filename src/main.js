@@ -29,10 +29,10 @@ let plants = [];
 let pictureFrames = [];
 let pillows = [];
 const overlay = document.querySelector(".overlay");
-const MUSIC_FADE_TIME = 500;
-let isMusicFaded = false;
 const BACKGROUND_MUSIC_VOLUME = 1;
-const FADE_VOLUME = 0;
+
+const useOriginalMeshObjects = ["Frame", "Plant", "Pillow"];
+const hitboxToObjectMap = new Map();
 
 const backgroundMusic = new Howl({
   src: ["/audio/music/song.ogg"],
@@ -41,24 +41,6 @@ const backgroundMusic = new Howl({
 });
 
 let isMuted = false;
-
-const fadeOutBackgroundMusic = () => {
-  if (!isMuted && !isMutedFaded) {
-    (backgroundMusic.fade(
-      backgroundMusic.volume(),
-      FADE_VOLUME,
-      MUSIC_FADE_TIME,
-    ),
-      (isMutedFaded = true));
-  }
-};
-
-const fadeInBackgroundMusic = () => {
-  if (!isMuted && isMusicFaded) {
-    backgroundMusic.fade(FADE_VOLUME, BACKGROUND_MUSIC_VOLUME, MUSIC_FADE_TIME);
-    isMutedFaded = false;
-  }
-};
 
 const buttonSounds = {
   click: new Howl({
@@ -89,6 +71,7 @@ overlay.addEventListener(
   },
   { passive: false },
 );
+let objectsWithIntroAnimations = [];
 
 const muteToggleButton = document.querySelector(".mute-toggle-button");
 
@@ -384,7 +367,8 @@ function playReveal() {
 
 function handleRaycasterInteractions() {
   if (currentIntersects.length > 0) {
-    const object = currentIntersects[0].object;
+    const hitbox = currentIntersects[0].object;
+    const object = hitboxToObjectMap.get(hitbox);
 
     if (object.name.includes("Button")) {
       buttonSounds.click.play();
@@ -467,152 +451,265 @@ const environmentMap = new THREE.CubeTextureLoader()
 
   .load(["px.webp", "nx.webp", "py.webp", "ny.webp", "pz.webp", "nz.webp"]);
 
+function hasIntroAnimation(objectName) {
+  return objectsWithIntroAnimations.includes(objectName);
+}
+
+function collectIntroObjects() {
+  objectsWithIntroAnimations = [
+    workBtn,
+    aboutBtn,
+    contactBtn,
+    github,
+    linkedin,
+    insta,
+    ...keyboardKeys,
+    ...nameLatters,
+    ...plants,
+    ...sofa,
+    ...pillows,
+    ...pictureFrames,
+  ].filter(Boolean);
+}
+
 /* ================= LOAD GLB ================= */
-gltfLoader.load(
-  "/model/room-v1.glb",
-  (glb) => {
-    glb.scene.traverse((child) => {
-      if (!child.isMesh) return;
+gltfLoader.load("/model/room-v1.glb", (glb) => {
+  glb.scene.traverse((child) => {
+    if (!child.isMesh) return;
 
-      if (child.name.includes("Pointer")) {
-        raycasterObject.push(child);
-      }
+    if (child.name.includes("Pointer")) {
+      raycasterObject.push(child);
+    }
 
-      // Hover objects
-      if (child.name.includes("Hover")) {
-        child.userData.initialScale = child.scale.clone();
-        child.userData.initialPosition = child.position.clone();
-        child.userData.initialRotation = child.rotation.clone();
-      }
+    // Hover objects
+    if (child.name.includes("Hover")) {
+      child.userData.initialScale = child.scale.clone();
+      child.userData.initialPosition = child.position.clone();
+      child.userData.initialRotation = child.rotation.clone();
+    }
 
-      if (child.name.includes("Chair_Top")) {
-        chairTop = child;
-        child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
-      }
+    if (child.name.includes("Chair_Top")) {
+      chairTop = child;
+      child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
+    }
 
-      if (child.name.includes("Hour_Hand")) {
-        hourHand = child;
-        child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
-      }
+    if (child.name.includes("Hour_Hand")) {
+      hourHand = child;
+      child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
+    }
 
-      if (child.name.includes("minute_Hand")) {
-        minuteHand = child;
-        child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
-      }
+    if (child.name.includes("minute_Hand")) {
+      minuteHand = child;
+      child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
+    }
 
-      if (child.name.includes("My_Work_Button")) {
-        workBtn = child;
-        child.scale.set(0, 0, 0);
-      } else if (child.name.includes("About__Button")) {
-        aboutBtn = child;
-        child.scale.set(0, 0, 0);
-      } else if (child.name.includes("Contact_Button")) {
-        contactBtn = child;
-        child.scale.set(0, 0, 0);
-      } else if (child.name.includes("GitHub")) {
-        github = child;
-        child.scale.set(0, 0, 0);
-      } else if (child.name.includes("LinkedIn")) {
-        linkedin = child;
-        child.scale.set(0, 0, 0);
-      } else if (child.name.includes("Instagram")) {
-        insta = child;
-        child.scale.set(0, 0, 0);
-      } else if (child.name.includes("Keycaps")) {
-        keyboardKeys.push(child);
-        child.scale.set(0, 0, 0);
-      }
+    if (child.name.includes("My_Work_Button")) {
+      workBtn = child;
+      child.scale.set(0, 0, 0);
+    } else if (child.name.includes("About__Button")) {
+      aboutBtn = child;
+      child.scale.set(0, 0, 0);
+    } else if (child.name.includes("Contact_Button")) {
+      contactBtn = child;
+      child.scale.set(0, 0, 0);
+    } else if (child.name.includes("GitHub")) {
+      github = child;
+      child.scale.set(0, 0, 0);
+    } else if (child.name.includes("LinkedIn")) {
+      linkedin = child;
+      child.scale.set(0, 0, 0);
+    } else if (child.name.includes("Instagram")) {
+      insta = child;
+      child.scale.set(0, 0, 0);
+    } else if (child.name.includes("Keycaps")) {
+      keyboardKeys.push(child);
+      child.scale.set(0, 0, 0);
+    }
 
-      if (child.name.includes("Screen")) {
-        child.material = new THREE.MeshStandardMaterial({
-          map: videoTexture,
-          roughness: 0.5,
-          metalness: 0,
-        });
-      }
+    if (child.name.includes("Screen")) {
+      child.material = new THREE.MeshStandardMaterial({
+        map: videoTexture,
+        roughness: 0.5,
+        metalness: 0,
+      });
+    }
 
+    if (
+      child.name.includes("Glass") ||
+      child.name.includes === "Coffe_table_Glass"
+    ) {
+      child.material = new THREE.MeshPhysicalMaterial({
+        transmission: 1,
+        transparent: true,
+        opacity: 1,
+        color: 0xfbfbfb,
+        metalness: 0,
+        roughness: 0,
+        ior: 3,
+        thickness: 0.01,
+        specularIntensity: 1,
+        envMap: environmentMap,
+        envMapIntensity: 1,
+        depthWrite: false,
+        specularColor: 0xfbfbfb,
+      });
+    }
+
+    if (child.name.includes("Name_Letter")) {
+      nameLatters.push(child);
+      child.scale.set(0, 0, 0);
+    }
+
+    if (child.name.includes("Plant")) {
+      plants.push(child);
+      child.scale.set(0, 0, 0);
+    }
+
+    if (child.name.includes("Sofa")) {
+      sofa.push(child);
+      child.scale.set(0, 0, 0);
+    }
+
+    if (child.name.includes("Pillow")) {
+      pillows.push(child);
+      child.scale.set(0, 0, 0);
+    }
+    if (child.name.includes("Frame")) {
+      pictureFrames.push(child);
+      child.scale.set(0, 0, 0);
+    }
+
+    if (child.name.includes("FAN")) {
       if (
-        child.name.includes("Glass") ||
-        child.name.includes === "Coffe_table_Glass"
+        child.name.includes("1") ||
+        child.name.includes("2") ||
+        child.name.includes("3")
       ) {
-        child.material = new THREE.MeshPhysicalMaterial({
-          transmission: 1,
-          transparent: true,
-          opacity: 1,
-          color: 0xfbfbfb,
-          metalness: 0,
-          roughness: 0,
-          ior: 3,
-          thickness: 0.01,
-          specularIntensity: 1,
-          envMap: environmentMap,
-          envMapIntensity: 1,
-          depthWrite: false,
-          specularColor: 0xfbfbfb,
-        });
+        xAxisFans.push(child);
+      } else {
+        yAxisFans.push(child);
       }
+    }
 
-      if (child.name.includes("Name_Letter")) {
-        nameLatters.push(child);
-        child.scale.set(0, 0, 0);
-      }
+    if (child.name.includes("Raycaster")) {
+      if (hasIntroAnimation(child.name)) {
+        // Create a hitbox for object after intro is done playing,
+        // Set an original scale first for the hitbox
+        child.userData.originalScale = new THREE.Vector3(1, 1, 1);
 
-      if (child.name.includes("Plant")) {
-        plants.push(child);
-        child.scale.set(0, 0, 0);
-      }
+        objectsNeedingHitboxes.push(child);
+      } else {
+        // Create immediate hitboxes/meshes for objects that DON'T have an intro animation
+        const raycastObject = createStaticHitbox(child);
 
-      if (child.name.includes("Sofa")) {
-        sofa.push(child);
-        child.scale.set(0, 0, 0);
-      }
-
-      if (child.name.includes("Pillow")) {
-        pillows.push(child);
-        child.scale.set(0, 0, 0);
-      }
-      if (child.name.includes("Frame")) {
-        pictureFrames.push(child);
-        child.scale.set(0, 0, 0);
-      }
-
-      if (child.name.includes("FAN")) {
-        if (
-          child.name.includes("1") ||
-          child.name.includes("2") ||
-          child.name.includes("3")
-        ) {
-          xAxisFans.push(child);
-        } else {
-          yAxisFans.push(child);
+        if (raycastObject !== child) {
+          scene.add(raycastObject);
         }
+
+        raycasterObject.push(raycastObject);
+        hitboxToObjectMap.set(raycastObject, child);
       }
-    });
+    }
+  });
+  collectIntroObjects();
 
-    /* ================= CENTER MODEL ================= */
-    const box = new THREE.Box3().setFromObject(glb.scene);
-    const center = box.getCenter(new THREE.Vector3());
-    glb.scene.position.sub(center);
+  /* ================= CENTER MODEL ================= */
+  const box = new THREE.Box3().setFromObject(glb.scene);
+  const center = box.getCenter(new THREE.Vector3());
+  glb.scene.position.sub(center);
 
-    scene.add(glb.scene);
-    setTimeout(playIntroAnimation, 100);
-  },
-  undefined,
-  (error) => console.error("Error loading GLB:", error),
-);
+  scene.add(glb.scene);
+  setTimeout(playIntroAnimation, 100);
+});
 
-function scaleIn({
-  items = [],
-  duration = 0.8,
-  ease = "back.out(1.8)",
-  stagger = 0,
-}) {
-  if (!items.length) return null;
-
-  return gsap.to(
-    items.map((item) => item.scale),
-    { x: 1, y: 1, z: 1, duration, ease, stagger },
+function shouldUseOriginalMesh(objectName) {
+  return useOriginalMeshObjects.some((meshName) =>
+    objectName.includes(meshName),
   );
+}
+
+function createStaticHitbox(originalObject) {
+  // Check if we should use original mesh
+  if (shouldUseOriginalMesh(originalObject.name)) {
+    if (!originalObject.userData.initialScale) {
+      originalObject.userData.initialScale = new THREE.Vector3().copy(
+        originalObject.scale,
+      );
+    }
+    if (!originalObject.userData.initialPosition) {
+      originalObject.userData.initialPosition = new THREE.Vector3().copy(
+        originalObject.position,
+      );
+    }
+    if (!originalObject.userData.initialRotation) {
+      originalObject.userData.initialRotation = new THREE.Euler().copy(
+        originalObject.rotation,
+      );
+    }
+
+    originalObject.userData.originalObject = originalObject;
+    return originalObject;
+  }
+
+  if (!originalObject.userData.initialScale) {
+    originalObject.userData.initialScale = new THREE.Vector3().copy(
+      originalObject.scale,
+    );
+  }
+  if (!originalObject.userData.initialPosition) {
+    originalObject.userData.initialPosition = new THREE.Vector3().copy(
+      originalObject.position,
+    );
+  }
+  if (!originalObject.userData.initialRotation) {
+    originalObject.userData.initialRotation = new THREE.Euler().copy(
+      originalObject.rotation,
+    );
+  }
+
+  const currentScale = originalObject.scale.clone();
+  const hasZeroScale =
+    currentScale.x === 0 || currentScale.y === 0 || currentScale.z === 0;
+
+  if (hasZeroScale && originalObject.userData.originalScale) {
+    originalObject.scale.copy(originalObject.userData.originalScale);
+  }
+
+  const box = new THREE.Box3().setFromObject(originalObject);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+
+  if (hasZeroScale) {
+    originalObject.scale.copy(currentScale);
+  }
+
+  let hitboxGeometry;
+  let sizeMultiplier = { x: 1.1, y: 1.75, z: 1.1 };
+
+  hitboxGeometry = new THREE.BoxGeometry(
+    size.x * sizeMultiplier.x,
+    size.y * sizeMultiplier.y,
+    size.z * sizeMultiplier.z,
+  );
+
+  const hitboxMaterial = new THREE.MeshBasicMaterial({
+    transparent: true,
+    opacity: 0,
+    visible: false,
+  });
+
+  const hitbox = new THREE.Mesh(hitboxGeometry, hitboxMaterial);
+  hitbox.position.copy(center);
+  hitbox.name = originalObject.name + "_Hitbox";
+  hitbox.userData.originalObject = originalObject;
+
+  if (originalObject.name.includes("Headphones")) {
+    hitbox.rotation.x = 0;
+    hitbox.rotation.y = Math.PI / 4;
+    hitbox.rotation.z = 0;
+  }
+
+  return hitbox;
 }
 
 function playIntroAnimation() {
@@ -713,39 +810,113 @@ window.addEventListener("resize", () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-function playHoverAnimation(object, isHovering) {
+function playHoverAnimation(objectHitbox, isHovering) {
+  const object = hitboxToObjectMap.get(objectHitbox) || objectHitbox; // fallback
+  if (!object) return; // safety check
+  let scale = 1.4;
+
   gsap.killTweensOf(object.scale);
   gsap.killTweensOf(object.rotation);
   gsap.killTweensOf(object.position);
 
+  if (object.name.includes("Coffee") && typeof smoke !== "undefined") {
+    gsap.killTweensOf(smoke.scale);
+    if (isHovering) {
+      gsap.to(smoke.scale, {
+        x: 1.4,
+        y: 1.4,
+        z: 1.4,
+        duration: 0.5,
+        ease: "back.out(2)",
+      });
+    } else {
+      gsap.to(smoke.scale, {
+        x: 1,
+        y: 1,
+        z: 1,
+        duration: 0.3,
+        ease: "back.out(2)",
+      });
+    }
+  }
+
   if (isHovering) {
+    // Scale animation
     gsap.to(object.scale, {
-      x: object.userData.initialScale.x * 1.2,
-      y: object.userData.initialScale.y * 1.2,
-      z: object.userData.initialScale.z * 1.2,
+      x: object.userData.initialScale.x * scale,
+      y: object.userData.initialScale.y * scale,
+      z: object.userData.initialScale.z * scale,
       duration: 0.5,
-      ease: "bounce.out(1.8)",
+      ease: "back.out(2)",
     });
 
-    gsap.to(object.rotation, {
-      y: object.userData.initialRotation.y + Math.PI / 8,
-      duration: 0.5,
-      ease: "bounce.out(1.8)",
-    });
+    // Rotation for buttons
+    if (object.name.includes("About_Button")) {
+      gsap.to(object.rotation, {
+        x: object.userData.initialRotation.x - Math.PI / 10,
+        duration: 0.5,
+        ease: "back.out(2)",
+      });
+    } else if (
+      object.name.includes("Contact_Button") ||
+      object.name.includes("My_Work_Button")
+    ) {
+      gsap.to(object.rotation, {
+        y: object.userData.initialRotation.x - Math.PI / 10,
+        duration: 0.5,
+        ease: "back.out(2)",
+      });
+    } else if (
+      object.name.includes("GitHub") ||
+      object.name.includes("LinkedIn") ||
+      object.name.includes("Instagram")
+    ) {
+      gsap.to(object.rotation, {
+        x: object.userData.initialRotation.x + Math.PI / 10,
+        duration: 0.5,
+        ease: "back.out(2)",
+      });
+    }
+
+    if (object.name.includes("Name_Letter")) {
+      gsap.to(object.position, {
+        y: object.userData.initialPosition.y + 0.2,
+        duration: 0.5,
+        ease: "back.out(2)",
+      });
+    }
   } else {
+    // Reset scale
     gsap.to(object.scale, {
       x: object.userData.initialScale.x,
       y: object.userData.initialScale.y,
       z: object.userData.initialScale.z,
       duration: 0.3,
-      ease: "bounce.out(1.8)",
+      ease: "back.out(2)",
     });
 
-    gsap.to(object.rotation, {
-      y: object.userData.initialRotation.y,
-      duration: 0.3,
-      ease: "bounce.out(1.8)",
-    });
+    if (
+      object.name.includes("About_Button") ||
+      object.name.includes("Contact_Button") ||
+      object.name.includes("My_Work_Button") ||
+      object.name.includes("GitHub") ||
+      object.name.includes("LinkedIn") ||
+      object.name.includes("Instagram")
+    ) {
+      gsap.to(object.rotation, {
+        x: object.userData.initialRotation.x,
+        duration: 0.3,
+        ease: "back.out(2)",
+      });
+    }
+
+    if (object.name.includes("Name_Letter")) {
+      gsap.to(object.position, {
+        y: object.userData.initialPosition.y,
+        duration: 0.3,
+        ease: "back.out(2)",
+      });
+    }
   }
 }
 
