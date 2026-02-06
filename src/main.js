@@ -10,8 +10,6 @@ import gsap from "gsap";
 
 import smokeVertexShader from "./shaders/smoke/vertex.glsl";
 import smokeFragmentShader from "./shaders/smoke/fragment.glsl";
-import themeVertexShader from "./shaders/theme/vertex.glsl";
-import themeFragmentShader from "./shaders/theme/fragment.glsl";
 
 const canvas = document.querySelector("#experience-canvas");
 
@@ -36,6 +34,7 @@ let pictureFrames = [];
 let pillows = [];
 const overlay = document.querySelector(".overlay");
 const BACKGROUND_MUSIC_VOLUME = 1;
+const textureLoader = new THREE.TextureLoader();
 
 const screens = {
   Computer_Screen: "/texture/video/Screen.mp4",
@@ -85,7 +84,7 @@ overlay.addEventListener(
   },
   { passive: false },
 );
-
+let objectsWithIntroAnimations = [];
 const muteToggleButton = document.querySelector(".mute-toggle-button");
 
 document.querySelectorAll(".model-exit-button").forEach((button) => {
@@ -169,7 +168,7 @@ const hideModel = (model) => {
   });
 };
 
-// smoke Shader setup
+// Smoke Shader setup
 const smokeGeometry = new THREE.PlaneGeometry(1, 1, 16, 64);
 smokeGeometry.translate(0, 0.5, 0);
 smokeGeometry.scale(0.33, 1, 0.33);
@@ -545,8 +544,8 @@ gltfLoader.load("/model/room.glb", (glb) => {
       child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
     }
 
-    if (child.name === "Coffe_Cup") {
-      coffeePosition = child.position.clone;
+    if (child.name.includes("Coffe_Cup")) {
+      coffeePosition = child.position.clone();
     }
 
     if (child.name.includes("My_Work_Button")) {
