@@ -8,6 +8,11 @@ import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import gsap from "gsap";
 
+import smokeVertexShader from "./shaders/smoke/vertex.glsl";
+import smokeFragmentShader from "./shaders/smoke/fragment.glsl";
+import themeVertexShader from "./shaders/theme/vertex.glsl";
+import themeFragmentShader from "./shaders/theme/fragment.glsl";
+
 const canvas = document.querySelector("#experience-canvas");
 
 /* ================= SCENE ================= */
@@ -24,12 +29,21 @@ let chairTop;
 let nameLatters = [];
 let hourHand;
 let minuteHand;
+let coffeePosition;
 let sofa = [];
 let plants = [];
 let pictureFrames = [];
 let pillows = [];
 const overlay = document.querySelector(".overlay");
 const BACKGROUND_MUSIC_VOLUME = 1;
+
+const screens = {
+  Computer_Screen: "/texture/video/Screen.mp4",
+  Laptop_Screen: "/texture/video/Screen.mp4",
+  Tap_Screen: "/texture/video/tablet.mp4",
+  Phone_Screen: "/texture/video/phone.mp4",
+  TV_Screen: "/texture/video/.mp4",
+};
 
 const useOriginalMeshObjects = ["Frame", "Plant", "Pillow"];
 const hitboxToObjectMap = new Map();
@@ -71,7 +85,6 @@ overlay.addEventListener(
   },
   { passive: false },
 );
-let objectsWithIntroAnimations = [];
 
 const muteToggleButton = document.querySelector(".mute-toggle-button");
 
@@ -156,6 +169,31 @@ const hideModel = (model) => {
   });
 };
 
+// smoke Shader setup
+const smokeGeometry = new THREE.PlaneGeometry(1, 1, 16, 64);
+smokeGeometry.translate(0, 0.5, 0);
+smokeGeometry.scale(0.33, 1, 0.33);
+
+const perlinTexture = textureLoader.load("/shaders/perlin.png");
+perlinTexture.wrapS = THREE.RepeatWrapping;
+perlinTexture.wrapT = THREE.RepeatWrapping;
+
+const smokeMaterial = new THREE.ShaderMaterial({
+  vertexShader: smokeVertexShader,
+  fragmentShader: smokeFragmentShader,
+  uniforms: {
+    uTime: new THREE.Uniform(0),
+    uPerlinTexture: new THREE.Uniform(perlinTexture),
+  },
+  side: THREE.DoubleSide,
+  transparent: true,
+  depthWrite: false,
+});
+
+const smoke = new THREE.Mesh(smokeGeometry, smokeMaterial);
+smoke.position.y = 1.83;
+scene.add(smoke);
+
 /* ================= SIZES ================= */
 const sizes = {
   width: window.innerWidth,
@@ -236,7 +274,7 @@ muteToggleButton.addEventListener(
 const socialLinks = {
   GitHub: "https://github.com/ThomasShikalepo",
   LinkedIn: "https://www.linkedin.com/in/thomas-shikalepo",
-  Instagrem: "https://www.instagram.com/thomas__deon/",
+  Instagram: "https://www.instagram.com/thomas__deon/",
 };
 
 window.addEventListener("mousemove", (event) => {
@@ -368,7 +406,9 @@ function playReveal() {
 function handleRaycasterInteractions() {
   if (currentIntersects.length > 0) {
     const hitbox = currentIntersects[0].object;
-    const object = hitboxToObjectMap.get(hitbox);
+    const object = hitboxToObjectMap.get(hitbox) || hitbox;
+
+    if (!object) return;
 
     if (object.name.includes("Button")) {
       buttonSounds.click.play();
@@ -426,18 +466,24 @@ const dirLight = new THREE.DirectionalLight(0xffffff, 2);
 dirLight.position.set(5, 5, 5);
 scene.add(dirLight);
 
-/* ================= VIDEO TEXTURE ================= */
-const videoElement = document.createElement("video");
-videoElement.src = "/texture/video/Screen.mp4"; // make sure the path is correct
-videoElement.loop = true;
-videoElement.muted = true;
-videoElement.playsInline = true;
-videoElement.autoplay = true;
-videoElement.play();
+const videoElements = [];
 
-const videoTexture = new THREE.VideoTexture(videoElement);
-videoTexture.flipY = false;
-videoTexture.colorSpace = THREE.SRGBColorSpace;
+Object.entries(screens).forEach(([screensName, videoPath]) => {
+  const video = document.createElement("video");
+  video.src = videoPath;
+  video.loop = true;
+  video.muted = true;
+  video.playsInline = true;
+  video.autoplay = true;
+
+  video.play().catch(() => {});
+
+  const texture = new THREE.VideoTexture(video);
+  texture.flipY = false;
+  texture.colorSpace = THREE.SRGBColorSpace;
+
+  videoElements[screensName] = texture;
+});
 
 /* ================= LOADERS ================= */
 const dracoLoader = new DRACOLoader();
@@ -450,10 +496,6 @@ const environmentMap = new THREE.CubeTextureLoader()
   .setPath("/texture/skybox")
 
   .load(["px.webp", "nx.webp", "py.webp", "ny.webp", "pz.webp", "nz.webp"]);
-
-function hasIntroAnimation(objectName) {
-  return objectsWithIntroAnimations.includes(objectName);
-}
 
 function collectIntroObjects() {
   objectsWithIntroAnimations = [
@@ -473,7 +515,7 @@ function collectIntroObjects() {
 }
 
 /* ================= LOAD GLB ================= */
-gltfLoader.load("/model/room-v1.glb", (glb) => {
+gltfLoader.load("/model/room.glb", (glb) => {
   glb.scene.traverse((child) => {
     if (!child.isMesh) return;
 
@@ -503,6 +545,10 @@ gltfLoader.load("/model/room-v1.glb", (glb) => {
       child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
     }
 
+    if (child.name === "Coffe_Cup") {
+      coffeePosition = child.position.clone;
+    }
+
     if (child.name.includes("My_Work_Button")) {
       workBtn = child;
       child.scale.set(0, 0, 0);
@@ -527,8 +573,11 @@ gltfLoader.load("/model/room-v1.glb", (glb) => {
     }
 
     if (child.name.includes("Screen")) {
+      const screenVideoTexture = videoElements[child.name];
+      if (!screenVideoTexture) return;
+
       child.material = new THREE.MeshStandardMaterial({
-        map: videoTexture,
+        map: screenVideoTexture,
         roughness: 0.5,
         metalness: 0,
       });
@@ -545,7 +594,8 @@ gltfLoader.load("/model/room-v1.glb", (glb) => {
         color: 0xfbfbfb,
         metalness: 0,
         roughness: 0,
-        ior: 3,
+        ior: 1.45,
+        alphaHash: 0.140909,
         thickness: 0.01,
         specularIntensity: 1,
         envMap: environmentMap,
@@ -558,6 +608,9 @@ gltfLoader.load("/model/room-v1.glb", (glb) => {
     if (child.name.includes("Name_Letter")) {
       nameLatters.push(child);
       child.scale.set(0, 0, 0);
+
+      raycasterObject.push(child);
+      hitboxToObjectMap.set(child, child);
     }
 
     if (child.name.includes("Plant")) {
@@ -592,25 +645,27 @@ gltfLoader.load("/model/room-v1.glb", (glb) => {
     }
 
     if (child.name.includes("Raycaster")) {
-      if (hasIntroAnimation(child.name)) {
-        // Create a hitbox for object after intro is done playing,
-        // Set an original scale first for the hitbox
-        child.userData.originalScale = new THREE.Vector3(1, 1, 1);
+      const raycastObject = createStaticHitbox(child);
 
-        objectsNeedingHitboxes.push(child);
-      } else {
-        // Create immediate hitboxes/meshes for objects that DON'T have an intro animation
-        const raycastObject = createStaticHitbox(child);
-
-        if (raycastObject !== child) {
-          scene.add(raycastObject);
-        }
-
+      if (raycastObject !== child) {
+        scene.add(raycastObject);
         raycasterObject.push(raycastObject);
-        hitboxToObjectMap.set(raycastObject, child);
+        hitboxToObjectMap.set(raycastObject, child); // crucial
+      } else {
+        raycasterObject.push(child);
+        hitboxToObjectMap.set(child, child);
       }
     }
   });
+
+  if (coffeePosition) {
+    smoke.position.set(
+      coffeePosition.x,
+      coffeePosition.y + 0.2,
+      coffeePosition.z,
+    );
+  }
+
   collectIntroObjects();
 
   /* ================= CENTER MODEL ================= */
@@ -708,7 +763,6 @@ function createStaticHitbox(originalObject) {
     hitbox.rotation.y = Math.PI / 4;
     hitbox.rotation.z = 0;
   }
-
   return hitbox;
 }
 
@@ -850,23 +904,7 @@ function playHoverAnimation(objectHitbox, isHovering) {
       ease: "back.out(2)",
     });
 
-    // Rotation for buttons
-    if (object.name.includes("About_Button")) {
-      gsap.to(object.rotation, {
-        x: object.userData.initialRotation.x - Math.PI / 10,
-        duration: 0.5,
-        ease: "back.out(2)",
-      });
-    } else if (
-      object.name.includes("Contact_Button") ||
-      object.name.includes("My_Work_Button")
-    ) {
-      gsap.to(object.rotation, {
-        y: object.userData.initialRotation.x - Math.PI / 10,
-        duration: 0.5,
-        ease: "back.out(2)",
-      });
-    } else if (
+    if (
       object.name.includes("GitHub") ||
       object.name.includes("LinkedIn") ||
       object.name.includes("Instagram")
@@ -939,6 +977,12 @@ const updateClockHands = () => {
 
 /* ================= ANIMATE ================= */
 const render = (timestamp) => {
+  const elapsedTime = clock.getElapsedTime();
+
+  // Update Shader Univform
+  smokeMaterial.uniforms.uTime.value = elapsedTime;
+
+  //Update Orbit Controls
   controls.update();
 
   // Update Clock hand rotation
