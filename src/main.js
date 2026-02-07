@@ -57,7 +57,7 @@ let isMuted = false;
 
 const buttonSounds = {
   click: new Howl({
-    src: ["/audio/sfx/click/bubble.ogg"],
+    src: ["/audio/click/bubble.ogg"],
     preload: true,
     volume: 0.5,
   }),
@@ -88,30 +88,55 @@ let objectsWithIntroAnimations = [];
 const muteToggleButton = document.querySelector(".mute-toggle-button");
 
 document.querySelectorAll(".model-exit-button").forEach((button) => {
+  function handleModelExit(e) {
+    e.preventDefault();
+    const modal = e.target.closest(".model");
+
+    gsap.to(button, {
+      scale: 5,
+      duration: 0.5,
+      ease: "back.out(2)",
+      onStart: () => {
+        gsap.to(button, {
+          scale: 1,
+          duration: 0.5,
+          ease: "back.out(2)",
+          onComplete: () => {
+            gsap.set(button, {
+              clearProps: "all",
+            });
+          },
+        });
+      },
+    });
+
+    buttonSounds.click.play();
+    hideModel(modal);
+  }
+
   button.addEventListener(
     "touchend",
-    (event) => {
+    (e) => {
       touchHappened = true;
-      const model = event.target.closest(".model");
-      hideModel(model);
+      handleModelExit(e);
     },
     { passive: false },
   );
 
   button.addEventListener(
     "click",
-    (event) => {
+    (e) => {
       if (touchHappened) return;
-      const model = event.target.closest(".model");
-      hideModel(model);
+      handleModelExit(e);
     },
     { passive: false },
   );
 });
-let isModelOpen = false;
 
-const showModel = (model) => {
-  model.style.display = "block";
+let isModelOpen = true;
+
+const showModel = (modal) => {
+  modal.style.display = "block";
   overlay.style.display = "block";
 
   isModelOpen = true;
@@ -124,9 +149,7 @@ const showModel = (model) => {
   document.body.style.cursor = "default";
   currentIntersects = [];
 
-  gsap.set(model, { opacity: 0 });
-
-  gsap.set(model, {
+  gsap.set(modal, {
     opacity: 0,
     scale: 0,
   });
@@ -139,12 +162,13 @@ const showModel = (model) => {
     duration: 0.5,
   });
 
-  gsap.to(model, {
+  gsap.to(modal, {
     opacity: 1,
     scale: 1,
     duration: 0.5,
     ease: "back.out(2)",
   });
+  buttonSounds.click.play();
 };
 
 const hideModel = (model) => {
@@ -494,7 +518,6 @@ gltfLoader.setDRACOLoader(dracoLoader);
 
 const environmentMap = new THREE.CubeTextureLoader()
   .setPath("/texture/skybox")
-
   .load(["px.webp", "nx.webp", "py.webp", "ny.webp", "pz.webp", "nz.webp"]);
 
 function collectIntroObjects() {
@@ -594,20 +617,10 @@ gltfLoader.load("/model/room.glb", (glb) => {
       child.name.includes === "Coffe_table_Glass"
     ) {
       child.material = new THREE.MeshPhysicalMaterial({
-        transmission: 1,
+        color: 0xffffff,
         transparent: true,
-        opacity: 1,
-        color: 0xfbfbfb,
-        metalness: 0,
-        roughness: 0,
-        ior: 1.45,
-        alphaHash: 0.140909,
-        thickness: 0.01,
-        specularIntensity: 1,
+        opacity: 0.5,
         envMap: environmentMap,
-        envMapIntensity: 1,
-        depthWrite: false,
-        specularColor: 0xfbfbfb,
       });
     }
 
@@ -675,7 +688,6 @@ gltfLoader.load("/model/room.glb", (glb) => {
   glb.scene.position.sub(center);
 
   scene.add(glb.scene);
-  setTimeout(playIntroAnimation, 100);
 });
 
 function shouldUseOriginalMesh(objectName) {
