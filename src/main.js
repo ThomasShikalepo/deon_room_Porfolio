@@ -191,7 +191,8 @@ const smokeMaterial = new THREE.ShaderMaterial({
 
 const smoke = new THREE.Mesh(smokeGeometry, smokeMaterial);
 smoke.position.y = 1.83;
-scene.add(smoke);
+smoke.rotation.y = Math.PI / 2;
+smoke.renderOrder = 10;
 
 /* ================= SIZES ================= */
 const sizes = {
@@ -446,7 +447,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 /* ================= CONTROLS ================= */
 const controls = new OrbitControls(camera, renderer.domElement);
 
-controls.minDistance = 6;
+controls.minDistance = 4;
 controls.maxDistance = 50;
 controls.minPolarAngle = 0;
 controls.maxPolarAngle = Math.PI / 2;
@@ -544,8 +545,14 @@ gltfLoader.load("/model/room.glb", (glb) => {
       child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
     }
 
-    if (child.name.includes("Coffe_Cup")) {
+    if (child.name.includes("Coffee")) {
       coffeePosition = child.position.clone();
+
+      child.add(smoke); // 🔥 parent smoke to mug
+      smoke.position.set(0, 0.2, 0); // local offset above mug
+
+      raycasterObject.push(child);
+      hitboxToObjectMap.set(child, child);
     }
 
     if (child.name.includes("My_Work_Button")) {
@@ -620,6 +627,9 @@ gltfLoader.load("/model/room.glb", (glb) => {
     if (child.name.includes("Sofa")) {
       sofa.push(child);
       child.scale.set(0, 0, 0);
+
+      raycasterObject.push(child);
+      hitboxToObjectMap.set(child, child);
     }
 
     if (child.name.includes("Pillow")) {
@@ -656,14 +666,6 @@ gltfLoader.load("/model/room.glb", (glb) => {
       }
     }
   });
-
-  if (coffeePosition) {
-    smoke.position.set(
-      coffeePosition.x,
-      coffeePosition.y + 0.2,
-      coffeePosition.z,
-    );
-  }
 
   collectIntroObjects();
 
