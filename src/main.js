@@ -27,7 +27,7 @@ let chairTop;
 let nameLatters = [];
 let hourHand;
 let minuteHand;
-let coffeePosition;
+
 let sofa = [];
 let plants = [];
 let pictureFrames = [];
@@ -44,7 +44,7 @@ const screens = {
   TV_Screen: "/texture/video/.mp4",
 };
 
-const useOriginalMeshObjects = ["Frame", "Plant", "Pillow"];
+const useOriginalMeshObjects = ["Frame", "Plant", "Pillow", "Slipper"];
 const hitboxToObjectMap = new Map();
 
 const backgroundMusic = new Howl({
@@ -230,6 +230,7 @@ const soundOnSvg = document.querySelector(".sound-on-svg");
 const updateMutedState = (muted) => {
   if (muted) {
     backgroundMusic.volume(0);
+    buttonSounds.click.mute(muted);
   } else {
     backgroundMusic.volume(BACKGROUND_MUSIC_VOLUME);
   }
@@ -335,10 +336,12 @@ window.addEventListener(
 const manager = new THREE.LoadingManager();
 
 const loadingScreen = document.querySelector(".loading-screen");
-const loadingScreenButton = document.querySelector(".loading-screen-button");
+const loadingScreenButton = document.querySelector(".loading-button");
 const noSoundButton = document.querySelector(".no-sound-button");
+const loadingMiffy = document.querySelector(".loading-miffy");
 
 manager.onLoad = function () {
+  loadingMiffy.style.display = "none";
   loadingScreenButton.style.border = "8px solid #2a0f4e";
   loadingScreenButton.style.background = "#401d49";
   loadingScreenButton.style.color = "#e6dede";
@@ -569,8 +572,6 @@ gltfLoader.load("/model/room.glb", (glb) => {
     }
 
     if (child.name.includes("Coffee")) {
-      coffeePosition = child.position.clone();
-
       child.add(smoke); // 🔥 parent smoke to mug
       smoke.position.set(0, 0.2, 0); // local offset above mug
 

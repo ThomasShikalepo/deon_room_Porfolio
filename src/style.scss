@@ -622,11 +622,29 @@ ul {
   border-radius: 48px;
 }
 
-.loading-screen-button {
-  font-family: "Motley Forces";
+.loading-screen {
+ @include vars.centered;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 108vw;
+  height: 108vh;
+  margin-left: -54vw;
+  margin-top: -54vh;
+  overflow: hidden;
+  z-index: 999999;
+  //  border: 8px solid #f5f5dc;
+  // background-color: #f5f5dd;
+  transform: perspective(1000px);
+  border-radius: 48px;
+
+}
+.loading-button {
   @include vars.centered;
+  font-family: "Motley Forces";
   background-color: transparent;
   padding: 10px 40px;
+  margin-top: -20px;
   outline: none;
   color: #e6dede;
   border-radius: 1.2rem;
@@ -634,6 +652,17 @@ ul {
   font-size: 42px;
 
 
+}
+
+.loading-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -4rem;
+}
+
+.loading-miffy {
+  width: 200px;
 }
 
 .no-sound-button {
@@ -668,9 +697,7 @@ ul {
   color: #e6dede;
 }
 
-.desktop-instructions {
 
-}
 
 // .mobile-instructions {
 //   @include media.media(">=tablet") {

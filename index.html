@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Deon Room Folio</title>
     <link rel="stylesheet" href="./src/style.scss" />
-  
 
     <meta name="language" content="English" />
     <meta property="og:locale" content="en_US" />
@@ -17,23 +16,22 @@
       property="og:description"
       content="I'm 김수아 (Kim Soo-ah). This is my portfolio website! I'm currently a student at Seoul National University studying computer science engineering and music. I love to take my combination of skills of technical and artsy skills to create beautiful things for the world that I am passionate about."
     />
-
   </head>
   <body class="light-theme">
-
     <div class="loading-screen">
-      <button class="loading-screen-button">
-        Loading...
-      </button>
-
-       <button class="no-sound-button">
-        
-      </button>
-
-      <p class="desktop-instructions instructions">use left/right click and mouse wheel to navigate!</p>
-      <p class="mobile-instructions instructions">use one or two fingers to navigate!</p>
+      <div class="loading-intro">
+        <img class="loading-miffy" src="/images/miffy.gif" alt="" srcset="" />
+        <button class="loading-button">Loading...</button>
+        <button class="no-sound-button"></button>
+      </div>
+      <p class="desktop-instructions instructions">
+        use left/right click and mouse wheel to navigate!
+      </p>
+      <p class="mobile-instructions instructions">
+        use one or two fingers to navigate!
+      </p>
     </div>
-    
+
     <div class="overlay"></div>
 
     <button class="mute-toggle-button toggle-buttons">
@@ -94,7 +92,6 @@
       </svg>
     </button>
 
-
     <div class="work model">
       <div class="model-wrapper">
         <h1 class="model-title">~ My Work ~</h1>
@@ -106,90 +103,117 @@
                 <div class="work-image-wrapper">
                   <img
                     class="work-base-image"
-                    src="/images/community.webp"
-                    alt=""
-                    srcset=""
-                  />
-                </div>
-                <div class="paragraph-section">
-                  <h2 class="model-paragraph-header">Community Leader</h2>
-                  <p class="model-paragraph-text">
-                    Organized several events and outreach with local communities
-                    and business to help international students familiarize with
-                    Korean culture!
-                  </p>
-                  <p class="model-paragraph-text sm-margin-top sm-font">
-                    Skills: Leadership, Communication, Community Building, Teamwork
-                  </div>
-                  </p>
-              </div>
-            </div>
-            <div class="work-project">
-              <div class="work-project-wrapper">
-                <div class="work-image-wrapper">
-                  <img
-                    class="work-base-image"
-                    src="/images/computer.webp"
-                    alt=""
-                    srcset=""
-                  />
-                </div>
-                <div class="paragraph-section">
-                  <h2 class="model-paragraph-header">MeloMochi</h2>
-                  <p class="model-paragraph-text">
-                    During my piano teaching journey, I created MeloMochi, an AI-powered compositional tool that helps students learn music theory through hands-on exploration. I designed the system to generate piano exercises and short pieces that adapt to each student's skill level, combining my experience as a pianist with my machine learning expertise. Using TensorFlow and pretty_midi, I trained models on classical repertoire to create exercises that feel musical while targeting specific technical challenges. The web interface I built with React allows students to interact with the generated pieces, visualize patterns, and even modify them in real-time. Working closely with my students throughout development helped me refine the system to ensure it genuinely supports their learning process, making music theory more engaging and practical.
-                  </p>
-                  <p class="model-paragraph-text sm-margin-top sm-font">
-                    Skills: Music Generation,
-                    TensorFlow,
-                    pretty_midi,
-                    Adaptive Learning,
-                    React,
-                    Music Theory,
-                    UX Design,
-                    Generative ML,
-                    Education Tech,
-                    Web Audio API
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="work-project">
-              <div class="work-project-wrapper">
-                <div class="work-image-wrapper">
-                  <img
-                    class="work-base-image"
-                    src="/images/piano.webp"
+                    src="/images/folio.webp"
                     alt=""
                     srcset=""
                   />
                 </div>
                 <div class="paragraph-section">
                   <h2 class="model-paragraph-header">
-                    PianoScope
+                    Interactive 3D Portfolio Website
                   </h2>
                   <p class="model-paragraph-text">
-                    PianoScope is my passion project that combines my love for
-                    piano and machine learning. I co-created this AI-powered
-                    tool with fellow musicians to help us better understand our
-                    playing patterns. Using deep learning and audio processing
-                    techniques I implemented in Python and TensorFlow, the
-                    system analyzes recordings to detect nuances in timing,
-                    dynamics, and pedaling. I built the interactive
-                    visualization interface using React, allowing
-                    performers to see how these elements evolve.
+                    Developed an interactive 3D portfolio website featuring a
+                    virtual room environment to showcase my projects and
+                    technical skills. Created and optimized 3D assets in
+                    Blender, including modeling, UV mapping, and texture baking
+                    for web performance. Implemented camera controls, hover
+                    interactions, and smooth animations using Three.js and GSAP,
+                    with a strong focus on responsive design and performance
+                    optimization.
                   </p>
                   <p class="model-paragraph-text sm-margin-top sm-font">
-                    Skills: Audio Processing,
-                    Signal Analysis,
-                    Machine Learning,
-                    Data Visualization,
-                    TensorFlow,
-                    React,
-                    Python,
-                    DSP (Digital Signal Processing),
-                    Performance Analytics,
-                    Audio Classification
+                    Skills: JavaScript, Three.js, Blender, GSAP, HTML, SCSS
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="work-project">
+              <div class="work-project-wrapper">
+                <div class="work-image-wrapper">
+                  <img
+                    class="work-base-image"
+                    src="/images/data-warehouse.webp"
+                    alt=""
+                    srcset=""
+                  />
+                </div>
+                <div class="paragraph-section">
+                  <h2 class="model-paragraph-header">
+                    SQL Data Warehouse Project
+                  </h2>
+                  <p class="model-paragraph-text">
+                    Designed and implemented a multi-layered Bronze–Silver–Gold
+                    SQL Data Warehouse that consolidated data from CRM and ERP
+                    systems to improve data accessibility and support analytical
+                    reporting. Developed ETL pipelines using SQL stored
+                    procedures to automate data extraction, transformation, and
+                    loading, reducing manual processing and ensuring reliable
+                    data synchronization.
+                  </p>
+                  <p class="model-paragraph-text sm-margin-top sm-font">
+                    Skills: SQL, Data Warehousing, ETL Pipelines, Stored
+                    Procedures
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="work-project">
+              <div class="work-project-wrapper">
+                <div class="work-image-wrapper">
+                  <img
+                    class="work-base-image"
+                    src="/images/chess.webp"
+                    alt=""
+                    srcset=""
+                  />
+                </div>
+                <div class="paragraph-section">
+                  <h2 class="model-paragraph-header">Chess AI Engine</h2>
+                  <p class="model-paragraph-text">
+                    Designed and implemented a complete chess engine, including
+                    board representation, move generation, and full rule
+                    enforcement such as check, checkmate, and stalemate.
+                    Developed an AI opponent using the Minimax algorithm to
+                    evaluate game states and select optimal moves. Built a
+                    graphical user interface using Pygame with full user
+                    interaction and game feedback.
+                  </p>
+                  <p class="model-paragraph-text sm-margin-top sm-font">
+                    Skills: Python, Minimax Algorithm, Game Logic, AI, Pygame
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="work-project">
+              <div class="work-project-wrapper">
+                <div class="work-image-wrapper">
+                  <img
+                    class="work-base-image"
+                    src="/images/e-library.webp"
+                    alt=""
+                    srcset=""
+                  />
+                </div>
+                <div class="paragraph-section">
+                  <h2 class="model-paragraph-header">
+                    E-Library Android Application
+                  </h2>
+                  <p class="model-paragraph-text">
+                    Developed a fully responsive Android E-Library application
+                    to make digital reading accessible and engaging,
+                    particularly for under-resourced communities. Built using
+                    Jetpack Compose and Firebase, the app allows users to browse
+                    categorized books, search in real time, and read full PDF
+                    documents within the app, with seamless cloud-based data
+                    synchronization.
+                  </p>
+                  <p class="model-paragraph-text sm-margin-top sm-font">
+                    Skills: Android, Jetpack Compose, Firebase, Firestore, PDF
+                    Viewer
                   </p>
                 </div>
               </div>
@@ -197,6 +221,104 @@
           </div>
         </div>
       </div>
+
+      <button class="model-exit-button">
+        <svg
+          width="98"
+          height="96"
+          viewBox="0 0 98 96"
+          class="exit-button-svg"
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect
+            width="115.92"
+            height="17.889"
+            rx="8.94448"
+            transform="matrix(-0.696845 0.717222 0.717222 0.696845 83.1709 0)"
+          />
+          <rect
+            width="115.92"
+            height="17.889"
+            rx="8.94448"
+            transform="matrix(0.73406 0.679084 0.679084 -0.73406 0 13.1318)"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <div class="about model">
+      <div class="model-wrapper">
+        <h1 class="model-title">~ About Me ~</h1>
+
+        <div class="model-content">
+          <div class="model-content-wrapper">
+            <div class="paragraph-section">
+              <div class="image-wrapper">
+                <img
+                  class="base-image"
+                  src="/images/profile_pic.jpg"
+                  alt=""
+                  srcset=""
+                />
+              </div>
+
+              <h2 class="model-paragraph-header">
+                Engineer, developer, & gamer at heart 💜
+              </h2>
+
+              <p class="model-paragraph-text">
+                Hi, I’m Thomas. I enjoy building things with code and turning
+                ideas into interactive experiences on the web. I’m especially
+                interested in the creative side of development, where clean
+                logic and thoughtful design come together.
+              </p>
+
+              <p class="model-paragraph-text sm-margin-top">
+                In my free time you’ll usually find me gaming—most often playing
+                Warframe or Euro Truck Simulator—watching videos, or
+                experimenting with side projects. I also like stepping away from
+                the screen now and then to clear my head and go for a walk.
+              </p>
+
+              <h2 class="model-paragraph-header">What I'm Up To:</h2>
+
+              <ul>
+                <li class="list-text">
+                  Working on personal projects to strengthen my software
+                  development and web engineering skills.
+                </li>
+                <li class="list-text">
+                  Experimenting with front-end design and interactive elements.
+                </li>
+                <li class="list-text">
+                  Building and refining this portfolio as a creative and
+                  interactive space to showcase my work.
+                </li>
+              </ul>
+
+              <h2 class="model-paragraph-header-2">
+                Portfolio credits and Inspiration:
+              </h2>
+
+              <ul>
+                <li class="list-text-2">
+                  This portfolio is designed as an interactive experience.
+                </li>
+                <li class="list-text-2">
+                  Inspired by creative developer portfolios and interactive web
+                  projects.
+                </li>
+                <li class="list-text-2">
+                  Some elements in this portfolio are interactive—feel free to
+                  click around and explore!
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <button class="model-exit-button">
         <svg
           width="98"
@@ -224,105 +346,6 @@
       </button>
     </div>
 
-    <div class="about model">
-  <div class="model-wrapper">
-    <h1 class="model-title">~ About Me ~</h1>
-
-    <div class="model-content">
-      <div class="model-content-wrapper">
-        <div class="paragraph-section">
-          <div class="image-wrapper">
-            <img
-              class="base-image"
-              src="/images/profile_pic.jpg"
-              alt=""
-              srcset=""
-            />
-          </div>
-
-          <h2 class="model-paragraph-header">
-            Engineer, developer, & gamer at heart 💜
-          </h2>
-
-          <p class="model-paragraph-text">
-            Hi, I’m Thomas. I enjoy building things with code and turning ideas
-            into interactive experiences on the web. I’m especially interested
-            in the creative side of development, where clean logic and thoughtful
-            design come together.
-          </p>
-
-          <p class="model-paragraph-text sm-margin-top">
-            In my free time you’ll usually find me gaming—most often playing
-            Warframe or Euro Truck Simulator—watching videos, or experimenting
-            with side projects. I also like stepping away from the screen now
-            and then to clear my head and go for a walk.
-          </p>
-
-          <h2 class="model-paragraph-header">What I'm Up To:</h2>
-
-          <ul>
-            <li class="list-text">
-              Working on personal projects to strengthen my software development
-              and web engineering skills.
-            </li>
-            <li class="list-text">
-              Experimenting with front-end design and interactive elements.
-            </li>
-            <li class="list-text">
-              Building and refining this portfolio as a creative and interactive
-              space to showcase my work.
-            </li>
-          </ul>
-
-          <h2 class="model-paragraph-header-2">
-            Portfolio credits and Inspiration:
-          </h2>
-
-          <ul>
-            <li class="list-text-2">
-              This portfolio is designed as an interactive experience.
-            </li>
-            <li class="list-text-2">
-              Inspired by creative developer portfolios and interactive web
-              projects.
-            </li>
-            <li class="list-text-2">
-              Some elements in this portfolio are interactive—feel free to click
-              around and explore!
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <button class="model-exit-button">
-    <svg
-      width="98"
-      height="96"
-      viewBox="0 0 98 96"
-      class="exit-button-svg"
-      fill="currentColor"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect
-        width="115.92"
-        height="17.889"
-        rx="8.94448"
-        transform="matrix(-0.696845 0.717222 0.717222 0.696845 83.1709 0)"
-        fill="currentColor"
-      />
-      <rect
-        width="115.92"
-        height="17.889"
-        rx="8.94448"
-        transform="matrix(0.73406 0.679084 0.679084 -0.73406 0 13.1318)"
-        fill="currentColor"
-      />
-    </svg>
-  </button>
-</div>
-
     <div class="contact model">
       <div class="model-wrapper">
         <h1 class="model-title">~ Say hello! ~</h1>
@@ -340,8 +363,21 @@
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                <svg class="contact-svg mail" width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M656.85 209.817C608.726 166.348 527.66 150 400 150C272.34 150 191.272 166.348 143.15 209.817M656.85 209.817C700.01 248.804 716.666 309.608 716.666 400C716.666 591.177 642.156 650 400 650C157.843 650 83.333 591.177 83.333 400C83.333 309.608 99.9903 248.804 143.15 209.817M656.85 209.817L447.14 419.527C421.103 445.56 378.893 445.56 352.86 419.527L143.15 209.817" stroke="currentColor" stroke-width="66.7" stroke-linecap="round" stroke-linejoin="round"/>
+                  <svg
+                    class="contact-svg mail"
+                    width="800"
+                    height="800"
+                    viewBox="0 0 800 800"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M656.85 209.817C608.726 166.348 527.66 150 400 150C272.34 150 191.272 166.348 143.15 209.817M656.85 209.817C700.01 248.804 716.666 309.608 716.666 400C716.666 591.177 642.156 650 400 650C157.843 650 83.333 591.177 83.333 400C83.333 309.608 99.9903 248.804 143.15 209.817M656.85 209.817L447.14 419.527C421.103 445.56 378.893 445.56 352.86 419.527L143.15 209.817"
+                      stroke="currentColor"
+                      stroke-width="66.7"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
                   </svg>
                 </a>
                 <a
@@ -405,11 +441,29 @@
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                <svg class="contact-svg instagram" width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M400 675C341.033 675 298.6 674.971 265.517 671.763C232.812 668.592 211.892 662.5 195.196 652.008C176.114 640.02 159.978 623.885 147.987 604.804C137.5 588.108 131.404 567.187 128.238 534.483C125.029 501.4 125 458.967 125 400C125 341.033 125.029 298.6 128.238 265.517C131.404 232.812 137.5 211.892 147.987 195.196C159.977 176.113 176.113 159.977 195.196 147.987C211.892 137.5 232.812 131.404 265.517 128.238C298.596 125.029 341.029 125 400 125C458.967 125 501.4 125.029 534.483 128.238C567.187 131.404 588.108 137.5 604.804 147.987C623.885 159.978 640.02 176.114 652.008 195.196C662.5 211.892 668.592 232.812 671.763 265.517C674.971 298.6 675 341.033 675 400C675 458.967 674.971 501.4 671.763 534.483C668.592 567.187 662.5 588.108 652.008 604.804C640.019 623.885 623.885 640.019 604.804 652.008C588.108 662.5 567.187 668.592 534.483 671.763C501.4 674.971 458.967 675 400 675Z" stroke="currentColor" stroke-width="66.7"/>
-                  <path d="M400 525C469.036 525 525 469.036 525 400C525 330.964 469.036 275 400 275C330.964 275 275 330.964 275 400C275 469.036 330.964 525 400 525Z" stroke="currentColor" stroke-width="66.7"/>
-                  <path d="M562.5 275C583.211 275 600 258.211 600 237.5C600 216.789 583.211 200 562.5 200C541.789 200 525 216.789 525 237.5C525 258.211 541.789 275 562.5 275Z" fill="currentColor"/>
-                </svg>
+                  <svg
+                    class="contact-svg instagram"
+                    width="800"
+                    height="800"
+                    viewBox="0 0 800 800"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M400 675C341.033 675 298.6 674.971 265.517 671.763C232.812 668.592 211.892 662.5 195.196 652.008C176.114 640.02 159.978 623.885 147.987 604.804C137.5 588.108 131.404 567.187 128.238 534.483C125.029 501.4 125 458.967 125 400C125 341.033 125.029 298.6 128.238 265.517C131.404 232.812 137.5 211.892 147.987 195.196C159.977 176.113 176.113 159.977 195.196 147.987C211.892 137.5 232.812 131.404 265.517 128.238C298.596 125.029 341.029 125 400 125C458.967 125 501.4 125.029 534.483 128.238C567.187 131.404 588.108 137.5 604.804 147.987C623.885 159.978 640.02 176.114 652.008 195.196C662.5 211.892 668.592 232.812 671.763 265.517C674.971 298.6 675 341.033 675 400C675 458.967 674.971 501.4 671.763 534.483C668.592 567.187 662.5 588.108 652.008 604.804C640.019 623.885 623.885 640.019 604.804 652.008C588.108 662.5 567.187 668.592 534.483 671.763C501.4 674.971 458.967 675 400 675Z"
+                      stroke="currentColor"
+                      stroke-width="66.7"
+                    />
+                    <path
+                      d="M400 525C469.036 525 525 469.036 525 400C525 330.964 469.036 275 400 275C330.964 275 275 330.964 275 400C275 469.036 330.964 525 400 525Z"
+                      stroke="currentColor"
+                      stroke-width="66.7"
+                    />
+                    <path
+                      d="M562.5 275C583.211 275 600 258.211 600 237.5C600 216.789 583.211 200 562.5 200C541.789 200 525 216.789 525 237.5C525 258.211 541.789 275 562.5 275Z"
+                      fill="currentColor"
+                    />
+                  </svg>
                 </a>
               </div>
             </div>
