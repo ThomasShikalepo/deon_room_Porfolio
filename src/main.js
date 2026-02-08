@@ -461,7 +461,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000,
 );
-camera.position.set(16.43126761931179, -6.623764458735895, 8.921471779258786);
+camera.position.set(19.6130268363598, -19.398094039486914, 13.804091239456255);
 
 /* ================= RENDERER ================= */
 const renderer = new THREE.WebGLRenderer({
@@ -474,8 +474,8 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 /* ================= CONTROLS ================= */
 const controls = new OrbitControls(camera, renderer.domElement);
 
-controls.minDistance = 4;
-controls.maxDistance = 50;
+controls.minDistance = 6;
+controls.maxDistance = 45;
 controls.minPolarAngle = 0;
 controls.maxPolarAngle = Math.PI / 2;
 controls.minAzimuthAngle = 0;
@@ -484,7 +484,7 @@ controls.maxAzimuthAngle = Math.PI / 2;
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
 
-controls.target.set(2.789303142482967, -15.121523035050409, 0.8168493703113104);
+controls.target.set(7.008967244165065, -28.853500209373113, 5.101621707255599);
 controls.update();
 
 /* ================= LIGHT ================= */
