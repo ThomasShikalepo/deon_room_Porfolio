@@ -50,6 +50,8 @@ const useOriginalMeshObjects = [
   "Pillow",
   "Slipper",
   "Headphones",
+  "Art_book",
+  "Strees_Lamp",
 ];
 const hitboxToObjectMap = new Map();
 
