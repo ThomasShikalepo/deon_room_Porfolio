@@ -44,7 +44,13 @@ const screens = {
   TV_Screen: "/texture/video/.mp4",
 };
 
-const useOriginalMeshObjects = ["Frame", "Plant", "Pillow", "Slipper"];
+const useOriginalMeshObjects = [
+  "Frame",
+  "Plant",
+  "Pillow",
+  "Slipper",
+  "Headphones",
+];
 const hitboxToObjectMap = new Map();
 
 const backgroundMusic = new Howl({
@@ -461,7 +467,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000,
 );
-camera.position.set(19.6130268363598, -19.398094039486914, 13.804091239456255);
+camera.position.set(28.31220588894812, -49.79692616580657, 14.231321062430657);
 
 /* ================= RENDERER ================= */
 const renderer = new THREE.WebGLRenderer({
@@ -484,7 +490,7 @@ controls.maxAzimuthAngle = Math.PI / 2;
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
 
-controls.target.set(7.008967244165065, -28.853500209373113, 5.101621707255599);
+controls.target.set(23.115278804824257, -52.13093724017618, 9.479097433255392);
 controls.update();
 
 /* ================= LIGHT ================= */
@@ -541,7 +547,7 @@ function collectIntroObjects() {
 }
 
 /* ================= LOAD GLB ================= */
-gltfLoader.load("/model/room.glb", (glb) => {
+gltfLoader.load("/model/room-v1.glb", (glb) => {
   glb.scene.traverse((child) => {
     if (!child.isMesh) return;
 
@@ -566,7 +572,7 @@ gltfLoader.load("/model/room.glb", (glb) => {
       child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
     }
 
-    if (child.name.includes("minute_Hand")) {
+    if (child.name.includes("Minute_Hand")) {
       minuteHand = child;
       child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
     }
