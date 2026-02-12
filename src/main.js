@@ -37,7 +37,7 @@ const BACKGROUND_MUSIC_VOLUME = 1;
 const textureLoader = new THREE.TextureLoader();
 
 const screens = {
-  Computer_Screen: "/texture/video/Screen.mp4",
+  Computer_Screen: "/texture/video/monitor_screen.webm",
   Laptop_Screen: "/texture/video/Screen.mp4",
   Tap_Screen: "/texture/video/tablet.mp4",
   Phone_Screen: "/texture/video/phone.mp4",
@@ -469,7 +469,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000,
 );
-camera.position.set(28.31220588894812, -49.79692616580657, 14.231321062430657);
+camera.position.set(20.0022813255786, -51.913568100634905, 6.260947882106164);
 
 /* ================= RENDERER ================= */
 const renderer = new THREE.WebGLRenderer({
@@ -482,7 +482,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 /* ================= CONTROLS ================= */
 const controls = new OrbitControls(camera, renderer.domElement);
 
-controls.minDistance = 6;
+controls.minDistance = 5;
 controls.maxDistance = 45;
 controls.minPolarAngle = 0;
 controls.maxPolarAngle = Math.PI / 2;
@@ -492,7 +492,7 @@ controls.maxAzimuthAngle = Math.PI / 2;
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
 
-controls.target.set(23.115278804824257, -52.13093724017618, 9.479097433255392);
+controls.target.set(13.969875247031045, -56.93207717433368, 0.9673013347925447);
 controls.update();
 
 /* ================= LIGHT ================= */
