@@ -1,7 +1,7 @@
 @use "./styles/fonts.scss";
 @use "./styles/reset.scss";
 @use "./styles/variables.scss" as vars;
-// @use "./styles/defaults.scss" as media;
+@use "./styles/defaults.scss" as media;
 
 // THIS SCSS CODE IS RUSHED AND SUPER BAD PLEASE DON'T LOOK AT IT LOOOOL
 
@@ -15,8 +15,7 @@ $themes: (
     header-text: #6c3f7c,
     text: #020202,
     svgs: #6e5e9c,
-  ),
-
+  )
 );
 
 // Theme mixins
@@ -137,7 +136,9 @@ ul {
   height: 550px;
   overflow: hidden;
   margin-bottom: 12px;
-
+  @include media.media("<=tablet") {
+    height: auto;
+  }
 }
 
 .base-image {
@@ -178,7 +179,7 @@ ul {
   -webkit-backdrop-filter: blur(4px);
 }
 
-//models
+//Modals
 .model {
   @include vars.centered;
   position: absolute;
@@ -221,14 +222,20 @@ ul {
   color: vars.$base-dark-purple;
   background-color: vars.$base-purple-200;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
- 
+  @include media.media("<=tablet") {
+    font-size: 1.5rem;
+    padding: 10px 20px;
+    width: 100%;
+  }
 }
 
 .model-paragraph-header {
   font-size: 1.5rem;
   margin-top: 24px;
   margin-bottom: 8px;
- 
+  @include media.media("<=tablet") {
+    font-size: 1.3rem;
+  }
 }
 
 .model-paragraph-header-2 {
@@ -236,22 +243,30 @@ ul {
   font-size: 1.2rem;
   padding-top: 24px;
   margin-bottom: 8px;
-
+  @include media.media("<=tablet") {
+    font-size: 1.3rem;
+  }
 }
 
 .model-paragraph-text {
   font-size: 1.5rem;
-
+  @include media.media("<=tablet") {
+    font-size: 1.3rem;
+  }
 }
 
 .list-text {
   font-size: 1.5rem;
-  
+  @include media.media("<=tablet") {
+    font-size: 1.3rem;
+  }
 }
 
 .list-text-2 {
   font-size: 1.2rem;
-  
+  @include media.media("<=tablet") {
+    font-size: 1.3rem;
+  }
 }
 
 .model-content {
@@ -261,25 +276,34 @@ ul {
   position: relative;
   -webkit-overflow-scrolling: touch;
 
-
+  @include media.media("<=tablet") {
+    height: 350px;
+  }
 }
 
 .work .model-content {
   height: 550px;
 
-
+  @include media.media("<=tablet") {
+    height: 500px;
+  }
 }
 
 .about .model-content {
   height: 550px;
-  
+  @include media.media("<=tablet") {
+    height: 500px;
+  }
 }
 
 .contact .model-content {
   height: 170px;
   overflow: visible;
 
-
+  @include media.media("<=tablet") {
+    overflow: visible;
+    height: 170px;
+  }
 }
 
 .model-content-wrapper {
@@ -310,7 +334,10 @@ ul {
   @include vars.centered;
   flex-direction: row;
   gap: 18px;
-
+  @include media.media("<=tablet") {
+    justify-content: space-between;
+    flex-direction: column;
+  }
 }
 
 .work-project {
@@ -321,7 +348,11 @@ ul {
   width: 80%;
   justify-content: start;
   height: 100%;
-
+  @include media.media("<=tablet") {
+    height: auto;
+    width: 100%;
+    padding-bottom: 24px;
+  }
 }
 
 .work-project-wrapper {
@@ -351,14 +382,27 @@ ul {
     transform: rotate(45deg) scale(1.3);
   }
 
+  @include media.media("<=tablet") {
+    // Reset the top and left positions
+    top: auto;
+    left: 50%;
+    bottom: -3rem;
+    transform: translateX(-50%);
 
+    &:hover {
+      transform: translateX(-50%) scale(1.3);
+    }
+  }
 }
 
 .exit-button-svg {
   width: 40px;
   height: 40px;
   color: vars.$base-purple;
-
+  @include media.media("<=tablet") {
+    width: 25px;
+    height: 25px;
+  }
 }
 
 .contact-button-wrapper {
@@ -425,7 +469,10 @@ ul {
     transform: rotate(-5deg) scale(1.3);
   }
 
-
+  @include media.media("<=tablet") {
+    top: 30px;
+    right: 96px;
+  }
 }
 
 .sound-svg {
@@ -433,7 +480,10 @@ ul {
   height: 40px;
 
   stroke: vars.$base-purple;
-
+  @include media.media("<=tablet") {
+    width: 30px;
+    height: 30px;
+  }
 }
 
 .sound-off-svg {
@@ -441,7 +491,14 @@ ul {
   height: 40px;
   display: none;
   stroke: vars.$base-purple;
-
+  @include media.media("<=tablet") {
+    top: 30px;
+    right: 96px;
+  }
+  @include media.media("<=tablet") {
+    width: 30px;
+    height: 30px;
+  }
 }
 
 .toggle-buttons {
@@ -467,7 +524,10 @@ ul {
     transform: rotate(5deg) scale(1.3);
   }
 
-
+  @include media.media("<=tablet") {
+    top: 30px;
+    right: 18px;
+  }
 }
 
 .sun-svg {
@@ -475,7 +535,10 @@ ul {
   height: 40px;
 
   stroke: vars.$base-purple;
-
+  @include media.media("<=tablet") {
+    width: 30px;
+    height: 30px;
+  }
 }
 
 .moon-svg {
@@ -483,7 +546,10 @@ ul {
   height: 40px;
   stroke: vars.$base-purple;
   display: none;
-
+  @include media.media("<=tablet") {
+    width: 30px;
+    height: 30px;
+  }
 }
 
 .sm-font {
@@ -622,36 +688,20 @@ ul {
   border-radius: 48px;
 }
 
-.loading-screen {
- @include vars.centered;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 108vw;
-  height: 108vh;
-  margin-left: -54vw;
-  margin-top: -54vh;
-  overflow: hidden;
-  z-index: 999999;
-  //  border: 8px solid #f5f5dc;
-  // background-color: #f5f5dd;
-  transform: perspective(1000px);
-  border-radius: 48px;
-
-}
 .loading-button {
-  @include vars.centered;
   font-family: "Motley Forces";
+  @include vars.centered;
   background-color: transparent;
   padding: 10px 40px;
-  margin-top: -20px;
   outline: none;
   color: #e6dede;
   border-radius: 1.2rem;
   border: none;
   font-size: 42px;
 
-
+  @include media.media("<=tablet") {
+    font-size: 32px;
+  }
 }
 
 .loading-intro {
@@ -664,6 +714,7 @@ ul {
 .loading-miffy {
   width: 200px;
 }
+
 
 .no-sound-button {
   font-family: "Motley Forces";
@@ -697,13 +748,17 @@ ul {
   color: #e6dede;
 }
 
+.desktop-instructions {
+  @include media.media("<tablet") {
+    display: none;
+  }
+}
 
-
-// .mobile-instructions {
-//   @include media.media(">=tablet") {
-//     display: none;
-//   }
-//   @include media.media("<=tablet") {
-//     font-size: 28px;
-//   }
-// }
+.mobile-instructions {
+  @include media.media(">=tablet") {
+    display: none;
+  }
+  @include media.media("<=tablet") {
+    font-size: 28px;
+  }
+}

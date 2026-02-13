@@ -1,4 +1,4 @@
-@use "../../node_modules/include-media/dist/_include-media.scss";
+@use "include-media" as *;;
 
 @forward "../../node_modules/include-media/dist/_include-media.scss";
 
