@@ -530,27 +530,8 @@ ul {
   }
 }
 
-.sun-svg {
-  width: 40px;
-  height: 40px;
 
-  stroke: vars.$base-purple;
-  @include media.media("<=tablet") {
-    width: 30px;
-    height: 30px;
-  }
-}
 
-.moon-svg {
-  width: 40px;
-  height: 40px;
-  stroke: vars.$base-purple;
-  display: none;
-  @include media.media("<=tablet") {
-    width: 30px;
-    height: 30px;
-  }
-}
 
 .sm-font {
   font-size: 1.2rem;
@@ -683,7 +664,7 @@ ul {
   overflow: hidden;
   z-index: 999999;
   border: 8px solid vars.$base-purple;
-  background-color: #2a0f4e;
+  background-color: #656D4A;
   transform: perspective(1000px);
   border-radius: 48px;
 }

@@ -54,9 +54,8 @@ const _STATE = {
 };
 const _EPS = 0.000001;
 
-const minPan = new Vector3(2, 7, 2);
-const maxPan = new Vector3(-1, -1, -2);
-
+const minPan = new Vector3(10, -60, 0);
+const maxPan = new Vector3(20, -50, 10);
 /**
  * Orbit controls allow the camera to orbit around a target.
  *
@@ -657,6 +656,8 @@ class OrbitControls extends Controls {
     } else {
       this.target.add(this._panOffset);
     }
+
+    this.target.clamp(minPan, maxPan);
 
     // Limit the target distance from the cursor to create a sphere around the center of interest
     this.target.sub(this.cursor);

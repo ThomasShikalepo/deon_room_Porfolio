@@ -58,7 +58,7 @@ const hitboxToObjectMap = new Map();
 const backgroundMusic = new Howl({
   src: ["/audio/music/song.ogg"],
   loop: true,
-  volume: 1,
+  volume: 0.5,
 });
 
 let isMuted = false;
@@ -350,8 +350,8 @@ const loadingMiffy = document.querySelector(".loading-miffy");
 
 manager.onLoad = function () {
   loadingMiffy.style.display = "none";
-  loadingScreenButton.style.border = "8px solid #2a0f4e";
-  loadingScreenButton.style.background = "#401d49";
+  loadingScreenButton.style.border = "8px solid #414833";
+  loadingScreenButton.style.background = "#656D4A";
   loadingScreenButton.style.color = "#e6dede";
   loadingScreenButton.style.boxShadow = "rgba(0, 0, 0, 0.24) 0px 3px 8px";
   loadingScreenButton.textContent = "Enter!";
@@ -461,15 +461,12 @@ function handleRaycasterInteractions() {
 }
 
 window.addEventListener("click", handleRaycasterInteractions);
-
-/* ================= CAMERA ================= */
 const camera = new THREE.PerspectiveCamera(
   45,
   sizes.width / sizes.height,
   0.1,
   1000,
 );
-camera.position.set(20.0022813255786, -51.913568100634905, 6.260947882106164);
 
 /* ================= RENDERER ================= */
 const renderer = new THREE.WebGLRenderer({
@@ -482,7 +479,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 /* ================= CONTROLS ================= */
 const controls = new OrbitControls(camera, renderer.domElement);
 
-controls.minDistance = 5;
+controls.minDistance = 3;
 controls.maxDistance = 45;
 controls.minPolarAngle = 0;
 controls.maxPolarAngle = Math.PI / 2;
@@ -492,11 +489,28 @@ controls.maxAzimuthAngle = Math.PI / 2;
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
 
-controls.target.set(13.969875247031045, -56.93207717433368, 0.9673013347925447);
 controls.update();
 
+/* ================= CAMERA ================= */
+
+if (window.innerWidth > 768) {
+  camera.position.set(
+    18.859231865020803,
+    -51.12604651496063,
+    9.229068890189588,
+  );
+  controls.target.set(
+    14.828057422717238,
+    -54.94913350843031,
+    5.117201014058143,
+  );
+} else {
+  camera.position.set(16.798217457331138, -47.27652533985537, 45.4944461422169);
+  controls.target.set(7.948590327159527, -54.60921526685177, 7.708031878311288);
+}
+
 /* ================= LIGHT ================= */
-scene.add(new THREE.AmbientLight(0xffffff, 1));
+scene.add(new THREE.AmbientLight(0xffffff, 2));
 const dirLight = new THREE.DirectionalLight(0xffffff, 2);
 dirLight.position.set(5, 5, 5);
 scene.add(dirLight);
@@ -1064,9 +1078,9 @@ const render = (timestamp) => {
   }
   controls.update();
 
-  // console.log(camera.position);
-  // console.log("##########################");
-  // console.log(controls.target);
+  console.log(camera.position);
+  console.log("##########################");
+  console.log(controls.target);
 
   renderer.render(scene, camera);
   requestAnimationFrame(render);
