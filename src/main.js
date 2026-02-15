@@ -635,10 +635,7 @@ gltfLoader.load("/model/room-v1.glb", (glb) => {
       });
     }
 
-    if (
-      child.name.includes("Glass") ||
-      child.name.includes === "Coffe_table_Glass"
-    ) {
+    if (child.name.includes("Glass")) {
       child.material = new THREE.MeshPhysicalMaterial({
         color: 0xffffff,
         transparent: true,
