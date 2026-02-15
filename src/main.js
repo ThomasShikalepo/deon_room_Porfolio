@@ -38,7 +38,7 @@ const textureLoader = new THREE.TextureLoader();
 
 const screens = {
   Computer_Screen: "/texture/video/monitor_screen.webm",
-  Laptop_Screen: "/texture/video/euro.mp4",
+  Laptop_Screen: "/texture/video/blender.webm",
   Tap_Screen: "/texture/video/tablet.mp4",
   Phone_Screen: "/texture/video/phone.mp4",
   TV_Screen: "/texture/video/.mp4",
