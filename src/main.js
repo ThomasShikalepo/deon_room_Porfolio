@@ -38,7 +38,7 @@ const textureLoader = new THREE.TextureLoader();
 
 const screens = {
   Computer_Screen: "/texture/video/monitor_screen.webm",
-  Laptop_Screen: "/texture/video/Screen.mp4",
+  Laptop_Screen: "/texture/video/euro.mp4",
   Tap_Screen: "/texture/video/tablet.mp4",
   Phone_Screen: "/texture/video/phone.mp4",
   TV_Screen: "/texture/video/.mp4",
@@ -367,12 +367,12 @@ manager.onLoad = function () {
 
     noSoundButton.textContent = "";
     loadingScreenButton.style.cursor = "default";
-    loadingScreenButton.style.border = "8px solid #6e5e9c";
-    loadingScreenButton.style.background = "#ead7ef";
-    loadingScreenButton.style.color = "#6e5e9c";
+    loadingScreenButton.style.border = "8px solid #414833";
+    loadingScreenButton.style.background = "#656D4A";
+    loadingScreenButton.style.color = "#e6dede";
     loadingScreenButton.style.boxShadow = "none";
     loadingScreenButton.textContent = "~ Hellow ~";
-    loadingScreen.style.background = "#ead7ef";
+    loadingScreen.style.background = "#656D4A";
     isDisabled = true;
 
     if (!withSound) {

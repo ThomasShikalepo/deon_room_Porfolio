@@ -7,16 +7,23 @@
 
 $themes: (
   light: (
-    base-dark-purple: #6c3f7c,
-    base-purple: #6e5e9c,
-    base-purple-200: #cdb3d6,
-    base-pink: #eedfe4,
-    base-light-purple: #ead7ef,
-    header-text: #6c3f7c,
-    text: #020202,
-    svgs: #6e5e9c,
+    // Green palette mapping (kept your key names so nothing breaks)
+    base-dark-purple: #333D29,   // deepest
+    base-purple: #414833,        // dark
+    base-purple-200: #656D4A,    // primary olive
+    base-pink: #A4AC86,          // soft sage
+    base-light-purple: #C2C5AA,  // light sage
+
+    header-text: #333D29,
+    text: #090909,
+    svgs: #414833,
+
+    // ✅ keys you reference later but didn’t define before
+    overlay-bg: rgba(51, 61, 41, 0.25),
+    scrollbar-track: rgba(101, 109, 74, 0.25),
   )
 );
+
 
 // Theme mixins
 @mixin themed() {
@@ -150,18 +157,21 @@ ul {
 }
 
 .work-image-wrapper {
-  width: 100%;
-  height: 350px;
+ width: 100%;
+  aspect-ratio: 1 / 1;   
   overflow: hidden;
-  margin-bottom: 12px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .work-base-image {
-  height: 100%;
   width: 100%;
+  height: 100%;
+  object-fit: cover;   // crops evenly
   border-radius: 24px;
-  object-fit: cover;
-  border: 6px solid vars.$base-purple;
+  border: 6px solid #414833; // your green dark
 }
 
 // Overlay
@@ -305,6 +315,12 @@ ul {
     height: 170px;
   }
 }
+.work .model-content-wrapper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+}
+
 
 .model-content-wrapper {
   height: 100%;
@@ -342,6 +358,9 @@ ul {
 
 .work-project {
   padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   @include vars.centered;
   flex-direction: column;
   gap: 28px;
