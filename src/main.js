@@ -479,7 +479,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 /* ================= CONTROLS ================= */
 const controls = new OrbitControls(camera, renderer.domElement);
 
-controls.minDistance = 3;
+controls.minDistance = 5;
 controls.maxDistance = 45;
 controls.minPolarAngle = 0;
 controls.maxPolarAngle = Math.PI / 2;
@@ -495,18 +495,26 @@ controls.update();
 
 if (window.innerWidth > 768) {
   camera.position.set(
-    18.859231865020803,
-    -51.12604651496063,
-    9.229068890189588,
+    15.961815961949501,
+    12.09745458326452,
+    12.868349009006998,
   );
   controls.target.set(
-    14.828057422717238,
-    -54.94913350843031,
-    5.117201014058143,
+    -23.325196944217364,
+    -15.396531237148738,
+    -22.5677637643661,
   );
 } else {
-  camera.position.set(16.798217457331138, -47.27652533985537, 45.4944461422169);
-  controls.target.set(7.948590327159527, -54.60921526685177, 7.708031878311288);
+  camera.position.set(
+    14.21246070016042,
+    21.534818660970846,
+    50.773592794520795,
+  );
+  controls.target.set(
+    -5.561447882288654,
+    -9.900617778667879,
+    -29.45987324666294,
+  );
 }
 
 /* ================= LIGHT ================= */
@@ -702,10 +710,10 @@ gltfLoader.load("/model/room-v1.glb", (glb) => {
 
   collectIntroObjects();
 
-  /* ================= CENTER MODEL ================= */
-  const box = new THREE.Box3().setFromObject(glb.scene);
-  const center = box.getCenter(new THREE.Vector3());
-  glb.scene.position.sub(center);
+  // /* ================= CENTER MODEL ================= */
+  // const box = new THREE.Box3().setFromObject(glb.scene);
+  // const center = box.getCenter(new THREE.Vector3());
+  // glb.scene.position.sub(center);
 
   scene.add(glb.scene);
 });

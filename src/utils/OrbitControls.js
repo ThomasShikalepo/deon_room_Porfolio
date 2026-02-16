@@ -54,8 +54,8 @@ const _STATE = {
 };
 const _EPS = 0.000001;
 
-const minPan = new Vector3(10, -60, 0);
-const maxPan = new Vector3(20, -50, 10);
+const minPan = new Vector3(-3, -7, -4);
+const maxPan = new Vector3(2, 8, 8);
 /**
  * Orbit controls allow the camera to orbit around a target.
  *
