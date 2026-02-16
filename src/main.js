@@ -1083,9 +1083,9 @@ const render = (timestamp) => {
   }
   controls.update();
 
-  console.log(camera.position);
-  console.log("##########################");
-  console.log(controls.target);
+  // console.log(camera.position);
+  // console.log("##########################");
+  // console.log(controls.target);
 
   renderer.render(scene, camera);
   requestAnimationFrame(render);
