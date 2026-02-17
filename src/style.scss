@@ -65,6 +65,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0;
+}
+
 // Experience
 #experience {
   position: fixed;
@@ -355,6 +360,7 @@ ul {
     flex-direction: column;
   }
 }
+
 
 .work-project {
   padding-top: 16px;
